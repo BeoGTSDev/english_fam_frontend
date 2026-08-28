@@ -16,9 +16,6 @@ jobs:
         with:
           node-version: '24'
       - run: npm install
-      - name: Verify formatting
-        run: |
-          npm run format
-          git diff --exit-code
+      - run: npm run format:check
       - run: npm run lint
       - run: npm run typecheck
