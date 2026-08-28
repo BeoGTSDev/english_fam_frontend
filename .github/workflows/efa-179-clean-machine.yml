@@ -1,0 +1,47 @@
+name: EFA-179 Frontend Clean Machine Validation
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  onboarding:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Start dev server and smoke test
+        shell: bash
+        run: |
+          npm run dev -- --host 127.0.0.1 > /tmp/englishfam-vite.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          for i in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:5173/ > /tmp/englishfam-home.html; then
+              grep -q '<div id="root"></div>' /tmp/englishfam-home.html
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/englishfam-vite.log
+          exit 1
