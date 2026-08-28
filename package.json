@@ -11,6 +11,8 @@
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b --pretty false",
     "lint": "oxlint",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"vite.config.ts\" \"tsconfig*.json\" \"package.json\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"vite.config.ts\" \"tsconfig*.json\" \"package.json\"",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -24,6 +26,7 @@
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.4",
     "oxlint": "1.75.0",
+    "prettier": "3.6.2",
     "tailwindcss": "4.3.3",
     "typescript": "6.0.2",
     "vite": "8.1.5"
