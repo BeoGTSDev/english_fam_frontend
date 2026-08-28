@@ -10,12 +10,12 @@ function App() {
         </h1>
         <p className="mt-4 text-slate-600">
           React, TypeScript, Vite and Tailwind CSS are configured. Product UI
-          implementation remains governed by the approved EnglishFam design
-          and technical contracts.
+          implementation remains governed by the approved EnglishFam design and
+          technical contracts.
         </p>
       </section>
     </main>
-  );
+  )
 }
 
-export default App;
+export default App
