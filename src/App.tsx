@@ -5,14 +5,17 @@ function App() {
         <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
           EnglishFam
         </p>
-        <h1 className="mt-3 text-3xl font-bold">Frontend development environment ready</h1>
+        <h1 className="mt-3 text-3xl font-bold">
+          Frontend development environment ready
+        </h1>
         <p className="mt-4 text-slate-600">
-          React, TypeScript, Vite and Tailwind CSS are configured. Product UI implementation
-          remains governed by the approved EnglishFam design and technical contracts.
+          React, TypeScript, Vite and Tailwind CSS are configured. Product UI
+          implementation remains governed by the approved EnglishFam design
+          and technical contracts.
         </p>
       </section>
     </main>
-  )
+  );
 }
 
-export default App
+export default App;
