@@ -1,9 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  type ReactNode,
-} from 'react'
+import { createContext, useContext, useState, type ReactNode } from 'react'
 
 export type Language = 'vi' | 'en'
 
@@ -44,7 +39,7 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
       'Quản trị phiên bản theo phả hệ văn bản pháp quy. Lịch sử được bảo toàn bất biến.',
     'ver.validateBtn': 'Thẩm định cấu trúc',
     'ver.approveBtn': 'Phê duyệt ban hành',
-    'ver.createBtn': '+ Tạo bản mới',
+    'ver.createBtn': 'Tạo bản mới',
     'ver.testConflict': 'Test xung đột',
     'ver.legalRef': 'Văn bản căn cứ:',
     'ver.effectiveFrom': 'Hiệu lực từ:',
@@ -70,7 +65,7 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     'outcome.manyToMany': 'Quan hệ nhiều-nhiều',
     'outcome.noMappedSkills':
       'Chưa có kỹ năng nào được ánh xạ tới chuẩn đầu ra này.',
-    'outcome.mapSkillBtn': '+ Ánh xạ kỹ năng',
+    'outcome.mapSkillBtn': 'Ánh xạ kỹ năng',
     'outcome.confidence': 'Độ tin cậy:',
     'outcome.rolePrimary': 'Trọng tâm',
     'outcome.roleSecondary': 'Bổ trợ',
@@ -152,7 +147,7 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
       'Version governance based on regulatory statutory lineage. History remains immutable.',
     'ver.validateBtn': 'Validate Structure',
     'ver.approveBtn': 'Approve & Publish',
-    'ver.createBtn': '+ Create New Version',
+    'ver.createBtn': 'Create Version',
     'ver.testConflict': 'Test Conflict',
     'ver.legalRef': 'Statutory Basis:',
     'ver.effectiveFrom': 'Effective From:',
@@ -178,7 +173,7 @@ const TRANSLATIONS: Record<Language, Record<string, string>> = {
     'outcome.manyToMany': 'Many-to-Many Relationship',
     'outcome.noMappedSkills':
       'No skills have been mapped to this learning outcome yet.',
-    'outcome.mapSkillBtn': '+ Map Skill',
+    'outcome.mapSkillBtn': 'Map Skill',
     'outcome.confidence': 'Confidence:',
     'outcome.rolePrimary': 'Primary',
     'outcome.roleSecondary': 'Secondary',

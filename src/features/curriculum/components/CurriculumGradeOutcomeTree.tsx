@@ -82,9 +82,9 @@ export function CurriculumGradeOutcomeTree({
   )
 
   return (
-    <div className="rounded-xl border border-slate-200/90 bg-white p-5 shadow-xs flex flex-col gap-4">
+    <div className="p-4 sm:p-5 flex flex-col gap-4 bg-white">
       {/* SSoT Rule Banner */}
-      <div className="flex items-start gap-3 rounded-lg border border-blue-200/80 bg-blue-50/70 p-3.5 text-xs text-blue-900 leading-relaxed">
+      <div className="flex items-start gap-2.5 rounded-lg border border-blue-200/80 bg-blue-50/60 p-3 text-xs text-blue-900 leading-relaxed">
         <svg
           className="h-4 w-4 shrink-0 text-blue-600 mt-0.5"
           fill="none"
@@ -99,20 +99,21 @@ export function CurriculumGradeOutcomeTree({
           />
         </svg>
         <div>
-          <strong>{t('ssot.ruleTitle')}</strong> {t('ssot.ruleText')}
+          <strong className="font-semibold">{t('ssot.ruleTitle')}</strong>{' '}
+          {t('ssot.ruleText')}
         </div>
       </div>
 
       {/* Level Group Selector (Tiểu học 1-5, THCS 6-9, THPT 10-12, hoặc Bands) */}
       {hasSchoolLevels && (
         <div className="flex flex-wrap items-center gap-1.5 border-b border-slate-100 pb-3">
-          <span className="text-xs font-bold text-slate-500 mr-2 uppercase tracking-wide">
+          <span className="text-xs font-bold text-slate-500 mr-2 uppercase tracking-wide text-[11px]">
             {language === 'vi' ? 'Phân cấp học:' : 'Education Level:'}
           </span>
           <button
             type="button"
             onClick={() => onSelectLevelGroup('ALL')}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer transition-colors ${
+            className={`inline-flex items-center h-7.5 rounded-lg px-2.5 py-1 text-xs font-semibold cursor-pointer transition-all duration-150 ${
               selectedLevelGroup === 'ALL'
                 ? 'bg-slate-800 text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -123,7 +124,7 @@ export function CurriculumGradeOutcomeTree({
           <button
             type="button"
             onClick={() => onSelectLevelGroup('PRIMARY')}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer transition-colors ${
+            className={`inline-flex items-center h-7.5 rounded-lg px-2.5 py-1 text-xs font-semibold cursor-pointer transition-all duration-150 ${
               selectedLevelGroup === 'PRIMARY'
                 ? 'bg-blue-600 text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -134,7 +135,7 @@ export function CurriculumGradeOutcomeTree({
           <button
             type="button"
             onClick={() => onSelectLevelGroup('SECONDARY')}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer transition-colors ${
+            className={`inline-flex items-center h-7.5 rounded-lg px-2.5 py-1 text-xs font-semibold cursor-pointer transition-all duration-150 ${
               selectedLevelGroup === 'SECONDARY'
                 ? 'bg-blue-600 text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -145,7 +146,7 @@ export function CurriculumGradeOutcomeTree({
           <button
             type="button"
             onClick={() => onSelectLevelGroup('HIGH')}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer transition-colors ${
+            className={`inline-flex items-center h-7.5 rounded-lg px-2.5 py-1 text-xs font-semibold cursor-pointer transition-all duration-150 ${
               selectedLevelGroup === 'HIGH'
                 ? 'bg-blue-600 text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -167,7 +168,7 @@ export function CurriculumGradeOutcomeTree({
                 key={grade.id}
                 type="button"
                 onClick={() => onSelectGrade(grade.id)}
-                className={`rounded-lg px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer min-h-[38px] ${
+                className={`inline-flex items-center h-8 rounded-lg px-3 py-1 text-xs font-semibold transition-all duration-150 cursor-pointer ${
                   isSelected
                     ? 'bg-blue-600 text-white shadow-xs'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'

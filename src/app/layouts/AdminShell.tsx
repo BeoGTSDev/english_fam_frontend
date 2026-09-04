@@ -180,27 +180,32 @@ export function AdminShell({
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col lg:flex-row antialiased">
+    <div className="min-h-screen bg-slate-100/90 text-slate-900 flex flex-col lg:flex-row antialiased">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex lg:w-72 lg:flex-col lg:fixed lg:inset-y-0 border-r border-slate-200/80 bg-white z-20 shadow-xs">
-        {/* Brand */}
-        <div className="flex items-center gap-3 px-6 py-4.5 border-b border-slate-100">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white font-black text-sm shadow-xs tracking-tight">
-            EF
-          </div>
-          <div>
-            <h1 className="text-sm font-bold tracking-tight text-slate-900 leading-snug">
-              {t('brand.title')}
+      <aside className="hidden lg:flex lg:w-68 lg:flex-col lg:fixed lg:inset-y-0 border-r border-slate-800 bg-[#0B132B] z-20 shadow-lg">
+        {/* Brand with Logo */}
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-800/80 bg-slate-950/40">
+          <img
+            src="/englishfam-logo.png"
+            alt="EnglishFam Logo"
+            className="h-8 w-auto object-contain rounded-md bg-white p-0.5 shadow-xs"
+          />
+          <div className="overflow-hidden">
+            <h1 className="text-xs font-bold tracking-tight text-white flex items-center gap-1.5 leading-tight">
+              EnglishFam
+              <span className="text-[9px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-400 border border-blue-500/30 px-1 py-0.2 rounded">
+                Admin
+              </span>
             </h1>
-            <span className="text-xs text-slate-500 font-medium">
+            <span className="text-[10px] text-slate-400 font-medium block truncate">
               {t('brand.subtitle')}
             </span>
           </div>
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-          <div className="px-3 pb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+          <div className="px-2.5 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
             {t('nav.section')}
           </div>
           {navItems.map((item) => {
@@ -210,20 +215,26 @@ export function AdminShell({
                 key={item.id}
                 type="button"
                 onClick={() => handleTabClick(item.id)}
-                className={`w-full flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-xs font-semibold transition-all cursor-pointer min-h-[42px] ${
+                className={`w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium transition-all duration-150 cursor-pointer ${
                   isActive
-                    ? 'bg-blue-50 text-blue-700 font-bold border-l-3 border-blue-600 shadow-2xs'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-blue-600 text-white font-semibold shadow-xs shadow-blue-500/30'
+                    : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
                 }`}
               >
-                <span className={isActive ? 'text-blue-600' : 'text-slate-400'}>
+                <span className={isActive ? 'text-white' : 'text-slate-400'}>
                   {item.icon}
                 </span>
                 <span className="flex-1 text-left truncate">
                   {t(item.labelKey)}
                 </span>
                 {item.id === 'curriculum' && (
-                  <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700">
+                  <span
+                    className={`rounded text-[10px] font-mono px-1.5 py-0.5 ${
+                      isActive
+                        ? 'bg-white/20 text-white'
+                        : 'bg-slate-800 text-slate-400'
+                    }`}
+                  >
                     EFA-198
                   </span>
                 )}
@@ -233,14 +244,14 @@ export function AdminShell({
         </nav>
 
         {/* Capability info footer */}
-        <div className="p-4 border-t border-slate-100 bg-slate-50/80">
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            <span className="text-xs font-semibold text-slate-700">
+        <div className="p-3 m-3 rounded-lg border border-slate-800 bg-slate-950/60">
+          <div className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-[11px] font-semibold text-slate-200">
               {t('nav.capability')}
             </span>
           </div>
-          <p className="mt-1 font-mono text-xs text-slate-500 leading-normal">
+          <p className="mt-1 font-mono text-[10px] text-slate-400 leading-tight">
             admin:curriculum:manage
             <br />
             admin:account:provision
@@ -249,14 +260,14 @@ export function AdminShell({
       </aside>
 
       {/* Mobile Top Header */}
-      <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 shadow-xs">
+      <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between border-b border-slate-800 bg-[#0B132B] px-4 py-2.5 shadow-md">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white font-bold text-xs">
-            EF
-          </div>
-          <span className="text-sm font-bold text-slate-900">
-            {t('brand.title')}
-          </span>
+          <img
+            src="/englishfam-logo.png"
+            alt="EnglishFam"
+            className="h-7 w-auto object-contain rounded bg-white p-0.5"
+          />
+          <span className="text-xs font-bold text-white">EnglishFam Admin</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -264,19 +275,19 @@ export function AdminShell({
           <button
             type="button"
             onClick={() => setLanguage(language === 'vi' ? 'en' : 'vi')}
-            className="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-bold text-blue-700 cursor-pointer"
+            className="rounded-full border border-slate-700 bg-slate-800 px-2.5 py-1 text-xs font-semibold text-blue-400 cursor-pointer"
           >
-            {language === 'vi' ? 'EN' : 'VI'}
+            {language === 'vi' ? '🇻🇳 VN' : '🇬🇧 EN'}
           </button>
 
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle Navigation Menu"
-            className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="rounded-lg p-1.5 text-slate-300 hover:bg-slate-800 cursor-pointer flex items-center justify-center"
           >
             <svg
-              className="h-6 w-6"
+              className="h-5 w-5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -303,16 +314,16 @@ export function AdminShell({
 
       {/* Mobile Navigation Drawer */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs flex">
-          <div className="w-4/5 max-w-sm bg-white p-4 flex flex-col h-full shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <span className="font-bold text-sm text-slate-900">
+        <div className="lg:hidden fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs flex">
+          <div className="w-4/5 max-w-xs bg-[#0B132B] border-r border-slate-800 p-4 flex flex-col h-full shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <span className="font-bold text-xs text-white">
                 {t('nav.section')}
               </span>
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="p-2 text-slate-400 hover:text-slate-600 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer"
+                className="p-1 text-slate-400 hover:text-white cursor-pointer"
               >
                 ✕
               </button>
@@ -323,10 +334,10 @@ export function AdminShell({
                   key={item.id}
                   type="button"
                   onClick={() => handleTabClick(item.id)}
-                  className={`w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold cursor-pointer min-h-[44px] ${
+                  className={`w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium cursor-pointer ${
                     currentTab === item.id
-                      ? 'bg-blue-50 text-blue-700 font-bold border-l-4 border-blue-600'
-                      : 'text-slate-700 hover:bg-slate-50'
+                      ? 'bg-blue-600 text-white font-semibold'
+                      : 'text-slate-300 hover:bg-slate-800'
                   }`}
                 >
                   {item.icon}
@@ -340,54 +351,72 @@ export function AdminShell({
       )}
 
       {/* Main Content Area */}
-      <div className="flex-1 lg:pl-72 flex flex-col min-h-screen">
+      <div className="flex-1 lg:pl-68 flex flex-col min-h-screen">
         {/* Top bar for desktop */}
-        <div className="hidden lg:flex items-center justify-between border-b border-slate-200/80 bg-white px-8 py-3 sticky top-0 z-10 shadow-2xs">
-          <div className="flex items-center gap-2.5 text-xs text-slate-500">
+        <div className="hidden lg:flex items-center justify-between border-b border-slate-200/80 bg-white px-6 py-2.5 sticky top-0 z-10 shadow-2xs">
+          <div className="flex items-center gap-2 text-xs text-slate-500">
             <span className="font-medium">Admin</span>
-            <span>/</span>
+            <span className="text-slate-300">/</span>
             <span className="font-semibold text-slate-800">
               {t(navItems.find((n) => n.id === currentTab)?.labelKey || '')}
             </span>
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Language switch */}
-            <div className="flex items-center rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-xs font-semibold">
+            {/* Professional Capsule Language Switcher */}
+            <div className="inline-flex items-center rounded-full border border-slate-200/90 bg-slate-100 p-0.5 text-xs font-semibold shadow-2xs">
               <button
                 type="button"
                 onClick={() => setLanguage('vi')}
-                className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full transition-all duration-150 cursor-pointer text-xs ${
                   language === 'vi'
-                    ? 'bg-white text-blue-700 font-bold shadow-xs border border-slate-200/60'
-                    : 'text-slate-500 hover:text-slate-800'
+                    ? 'bg-white text-blue-700 font-bold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 font-medium'
                 }`}
               >
-                Tiếng Việt
+                <span
+                  className={`text-[9px] font-bold uppercase px-1 py-0.2 rounded ${
+                    language === 'vi'
+                      ? 'bg-red-50 text-red-600 border border-red-200/80'
+                      : 'bg-slate-200 text-slate-600'
+                  }`}
+                >
+                  VN
+                </span>
+                <span>Tiếng Việt</span>
               </button>
               <button
                 type="button"
                 onClick={() => setLanguage('en')}
-                className={`px-3 py-1.5 rounded-md transition-all cursor-pointer ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full transition-all duration-150 cursor-pointer text-xs ${
                   language === 'en'
-                    ? 'bg-white text-blue-700 font-bold shadow-xs border border-slate-200/60'
-                    : 'text-slate-500 hover:text-slate-800'
+                    ? 'bg-white text-blue-700 font-bold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 font-medium'
                 }`}
               >
-                English
+                <span
+                  className={`text-[9px] font-bold uppercase px-1 py-0.2 rounded ${
+                    language === 'en'
+                      ? 'bg-blue-50 text-blue-600 border border-blue-200/80'
+                      : 'bg-slate-200 text-slate-600'
+                  }`}
+                >
+                  EN
+                </span>
+                <span>English</span>
               </button>
             </div>
 
             {/* Profile avatar */}
-            <div className="flex items-center gap-2.5 pl-3 border-l border-slate-200">
-              <div className="h-8 w-8 rounded-full bg-blue-100 text-blue-800 font-bold text-xs flex items-center justify-center">
+            <div className="flex items-center gap-2 pl-3 border-l border-slate-200">
+              <div className="h-7 w-7 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-bold text-xs flex items-center justify-center shadow-xs">
                 AD
               </div>
               <div className="text-left leading-tight">
                 <div className="text-xs font-bold text-slate-800">
                   {t('profile.role')}
                 </div>
-                <div className="text-xs text-slate-400">
+                <div className="text-[11px] text-slate-400">
                   {t('profile.email')}
                 </div>
               </div>
@@ -396,7 +425,7 @@ export function AdminShell({
         </div>
 
         {/* Content body */}
-        <main className="flex-1 p-3 sm:p-5 lg:p-6">{children}</main>
+        <main className="flex-1 p-3 sm:p-4 lg:p-5">{children}</main>
       </div>
     </div>
   )

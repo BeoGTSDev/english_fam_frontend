@@ -127,17 +127,17 @@ export function AdminCurriculumPage() {
   const isVersionApproved = selectedVersion?.status === 'APPROVED'
 
   return (
-    <div className="mx-auto max-w-6xl flex flex-col gap-4">
-      {/* Top Header & Curriculum Selector */}
-      <div className="rounded-xl border border-slate-200/90 bg-white p-5 shadow-xs flex flex-col gap-4">
+    <div className="mx-auto max-w-6xl flex flex-col gap-3.5">
+      {/* Top Header & Program Selector (Direct on Canvas, No Giant Card) */}
+      <div className="flex flex-col gap-2">
         {/* Category & Action row */}
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600">
               {t('curr.category')}
             </span>
             <span className="text-slate-300">•</span>
-            <span className="text-xs text-slate-500 font-mono">
+            <span className="text-[11px] text-slate-500 font-mono">
               EFA-198 / UF-ADM-003
             </span>
           </div>
@@ -153,66 +153,70 @@ export function AdminCurriculumPage() {
           </Button>
         </div>
 
-        {/* Curriculum Switcher Tabs */}
-        <div>
-          <label className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">
-            {t('curr.selectProgram')}
-          </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+        {/* Curriculum Switcher Segmented Control */}
+        <div className="flex flex-col gap-1.5">
+          <div className="inline-flex p-1 bg-slate-200/70 rounded-xl gap-1 max-w-full overflow-x-auto shadow-2xs [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {curricula.map((c) => {
               const isSelected = c.id === selectedCurriculumId
+              const badgeConfig =
+                c.id === 'curr-moet-gdpt'
+                  ? { label: 'GDPT', bg: 'bg-blue-100 text-blue-700' }
+                  : c.id === 'curr-ielts'
+                    ? { label: 'IELTS', bg: 'bg-amber-100 text-amber-700' }
+                    : c.id === 'curr-toeic'
+                      ? { label: 'TOEIC', bg: 'bg-emerald-100 text-emerald-700' }
+                      : { label: 'CAMBRIDGE', bg: 'bg-purple-100 text-purple-700' }
+
               return (
                 <button
                   key={c.id}
                   type="button"
                   onClick={() => selectCurriculum(c.id)}
-                  className={`flex flex-col text-left p-3 rounded-xl border transition-all cursor-pointer min-h-[44px] ${
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     isSelected
-                      ? 'border-blue-600 bg-blue-50/60 shadow-xs ring-1 ring-blue-600'
-                      : 'border-slate-200 bg-slate-50/60 hover:bg-slate-100/80 hover:border-slate-300'
+                      ? 'bg-white text-blue-700 shadow-xs ring-1 ring-slate-200/80 font-bold'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-1">
-                    <span className="font-bold text-xs text-slate-900 line-clamp-1">
-                      {language === 'vi' ? c.name_vi : c.name_en}
-                    </span>
-                    {isSelected && (
-                      <span className="h-2 w-2 rounded-full bg-blue-600 shrink-0" />
-                    )}
-                  </div>
-                  <span className="text-xs font-mono text-slate-500 mt-1">
-                    {c.curriculum_code}
+                  <span
+                    className={`text-[9px] font-bold px-1.5 py-0.5 rounded tracking-wide ${badgeConfig.bg}`}
+                  >
+                    {badgeConfig.label}
+                  </span>
+                  <span>{language === 'vi' ? c.name_vi : c.name_en}</span>
+                  <span className="font-mono text-[10px] text-slate-400">
+                    ({c.curriculum_code})
                   </span>
                 </button>
               )
             })}
           </div>
+
+          {/* Active Curriculum Metadata Strip */}
+          {selectedCurriculum && (
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 px-1 py-0.5">
+              <div>
+                <span className="text-slate-400">{t('curr.authority')}</span>{' '}
+                <strong className="text-slate-700 font-semibold">
+                  {selectedCurriculum.authority_name}
+                </strong>
+              </div>
+              <span className="text-slate-300">•</span>
+              <div>
+                <span className="text-slate-400">{t('curr.identifier')}</span>{' '}
+                <code className="font-mono text-slate-700 font-semibold">
+                  {selectedCurriculum.curriculum_code}
+                </code>
+              </div>
+              <span className="text-slate-300">•</span>
+              <div className="text-slate-600 truncate max-w-xl">
+                {language === 'vi'
+                  ? selectedCurriculum.description_vi
+                  : selectedCurriculum.description_en}
+              </div>
+            </div>
+          )}
         </div>
-
-        {/* Active Curriculum Summary */}
-        {selectedCurriculum && (
-          <div className="rounded-lg bg-slate-50/80 p-3 text-xs text-slate-600 border border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <div>
-              <span className="text-slate-400">{t('curr.authority')}</span>{' '}
-              <strong className="text-slate-800 font-semibold">
-                {selectedCurriculum.authority_name}
-              </strong>
-              <span className="mx-2 text-slate-300">|</span>
-              <span className="text-slate-400">
-                {t('curr.identifier')}
-              </span>{' '}
-              <code className="text-slate-700 font-mono font-semibold">
-                {selectedCurriculum.curriculum_code}
-              </code>
-            </div>
-
-            <div className="text-slate-500 text-xs truncate max-w-md">
-              {language === 'vi'
-                ? selectedCurriculum.description_vi
-                : selectedCurriculum.description_en}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Notifications & Banners */}
@@ -253,32 +257,35 @@ export function AdminCurriculumPage() {
         </Alert>
       )}
 
-      {/* Section 1: Version Management */}
-      <CurriculumVersionList
-        versions={versions}
-        selectedVersionId={selectedVersionId}
-        onSelectVersion={selectVersion}
-        onCreateVersionClick={() => setIsCreateModalOpen(true)}
-        onValidateClick={validateVersion}
-        onApproveClick={approveVersion}
-        onTriggerConflict={triggerConflictSimulation}
-      />
+      {/* UNIFIED SINGLE WORKSPACE PANEL */}
+      <div className="rounded-xl border border-slate-200/90 bg-white shadow-xs overflow-hidden">
+        {/* Section 1: Version Governance Toolbar */}
+        <CurriculumVersionList
+          versions={versions}
+          selectedVersionId={selectedVersionId}
+          onSelectVersion={selectVersion}
+          onCreateVersionClick={() => setIsCreateModalOpen(true)}
+          onValidateClick={validateVersion}
+          onApproveClick={approveVersion}
+          onTriggerConflict={triggerConflictSimulation}
+        />
 
-      {/* Section 2: Grades & Learning Outcomes Workspace */}
-      <CurriculumGradeOutcomeTree
-        grades={grades}
-        allGrades={allGrades}
-        selectedLevelGroup={selectedLevelGroup}
-        onSelectLevelGroup={setSelectedLevelGroup}
-        selectedGradeId={selectedGradeId}
-        onSelectGrade={selectGrade}
-        outcomes={outcomes}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        onOpenMappingModal={(outcome) => setMappingModalOutcome(outcome)}
-        onRemoveMapping={removeMapping}
-        isVersionApproved={isVersionApproved}
-      />
+        {/* Section 2: Grades & Learning Outcomes Tree Workspace */}
+        <CurriculumGradeOutcomeTree
+          grades={grades}
+          allGrades={allGrades}
+          selectedLevelGroup={selectedLevelGroup}
+          onSelectLevelGroup={setSelectedLevelGroup}
+          selectedGradeId={selectedGradeId}
+          onSelectGrade={selectGrade}
+          outcomes={outcomes}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onOpenMappingModal={(outcome) => setMappingModalOutcome(outcome)}
+          onRemoveMapping={removeMapping}
+          isVersionApproved={isVersionApproved}
+        />
+      </div>
 
       {/* Modals */}
       <CurriculumVersionCreateModal

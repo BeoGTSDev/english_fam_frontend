@@ -20,25 +20,25 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseClasses =
-    'inline-flex items-center justify-center font-medium transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 select-none min-h-[44px] rounded-lg'
+    'inline-flex items-center justify-center font-medium transition-all duration-150 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-1 select-none active:scale-[0.98]'
 
   const variantClasses = {
     primary:
-      'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 focus-visible:ring-blue-600 shadow-xs',
+      'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 focus-visible:ring-blue-600 shadow-xs border border-blue-600',
     secondary:
-      'bg-slate-100 text-slate-900 hover:bg-slate-200 active:bg-slate-300 focus-visible:ring-slate-500',
+      'bg-slate-100 text-slate-700 hover:bg-slate-200/80 active:bg-slate-300/80 focus-visible:ring-slate-400 border border-slate-200/80 shadow-2xs',
     outline:
-      'border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 active:bg-slate-100 focus-visible:ring-blue-600',
+      'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900 active:bg-slate-100 focus-visible:ring-blue-500 shadow-2xs',
     danger:
-      'bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 focus-visible:ring-rose-600 shadow-xs',
+      'bg-rose-600 text-white hover:bg-rose-700 active:bg-rose-800 focus-visible:ring-rose-600 shadow-xs border border-rose-600',
     ghost:
-      'text-slate-700 hover:bg-slate-100 active:bg-slate-200 focus-visible:ring-slate-500',
+      'text-slate-600 hover:bg-slate-100 hover:text-slate-900 active:bg-slate-200/70 focus-visible:ring-slate-400',
   }
 
   const sizeClasses = {
-    sm: 'text-xs px-3 py-1.5 gap-1.5 min-w-[70px]',
-    md: 'text-sm px-4 py-2 gap-2 min-w-[90px]',
-    lg: 'text-base px-5 py-2.5 gap-2.5 min-w-[110px]',
+    sm: 'h-8 text-xs px-2.5 py-1 gap-1.5 rounded-md',
+    md: 'h-9 text-xs px-3.5 py-1.5 gap-2 rounded-lg',
+    lg: 'h-10 text-sm px-4 py-2 gap-2.5 rounded-lg',
   }
 
   return (
