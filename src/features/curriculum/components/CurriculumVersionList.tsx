@@ -188,63 +188,56 @@ export function CurriculumVersionList({
         })}
       </div>
 
-      {/* Metadata strip */}
+      {/* Flat Metadata & Immutability Strip (No stacked boxes) */}
       {selectedVersion && (
-        <div className="mt-3 rounded-lg bg-white p-2.5 text-xs text-slate-600 border border-slate-200/70 flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between shadow-2xs">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+        <div className="mt-3 pt-2.5 border-t border-slate-200/70 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <div>
-              <span className="text-slate-400">{t('ver.legalRef')}</span>{' '}
-              <strong className="text-slate-800 font-semibold">
+              <span className="text-slate-400">{t('ver.legalRef')}:</span>{' '}
+              <strong className="text-slate-800 font-semibold font-mono text-[11px]">
                 {selectedVersion.document_reference}
               </strong>
             </div>
+            <span className="text-slate-300">•</span>
             <div>
-              <span className="text-slate-400">{t('ver.effectiveFrom')}</span>{' '}
+              <span className="text-slate-400">{t('ver.effectiveFrom')}:</span>{' '}
               <strong className="text-slate-800 font-semibold">
                 {selectedVersion.effective_from}
               </strong>
             </div>
             {selectedVersion.supersedes_version_id && (
-              <div>
-                <span className="text-slate-400">{t('ver.supersedes')}</span>{' '}
-                <strong className="text-slate-800 font-semibold">
-                  {selectedVersion.supersedes_version_id}
-                </strong>
-              </div>
+              <>
+                <span className="text-slate-300">•</span>
+                <div>
+                  <span className="text-slate-400">{t('ver.supersedes')}:</span>{' '}
+                  <strong className="text-slate-800 font-semibold font-mono text-[11px]">
+                    {selectedVersion.supersedes_version_id}
+                  </strong>
+                </div>
+              </>
+            )}
+            {selectedVersion.change_reason && (
+              <>
+                <span className="text-slate-300">•</span>
+                <span
+                  className="italic text-slate-500 text-[11px] max-w-sm truncate"
+                  title={selectedVersion.change_reason}
+                >
+                  &ldquo;{selectedVersion.change_reason}&rdquo;
+                </span>
+              </>
             )}
           </div>
 
-          {selectedVersion.change_reason && (
-            <div
-              className="italic text-slate-500 sm:max-w-xs truncate text-[11px]"
-              title={selectedVersion.change_reason}
-            >
-              &ldquo;{selectedVersion.change_reason}&rdquo;
+          {selectedVersion.status === 'APPROVED' && (
+            <div className="inline-flex items-center gap-1.5 text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60 font-medium">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
+              <span>
+                <strong>{t('ver.immutableRuleTitle')}:</strong>{' '}
+                {t('ver.immutableRuleText')}
+              </span>
             </div>
           )}
-        </div>
-      )}
-
-      {/* Immutability guidance */}
-      {selectedVersion?.status === 'APPROVED' && (
-        <div className="mt-2.5 flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50/80 border border-emerald-200/70 rounded-lg px-3 py-1.5">
-          <svg
-            className="h-3.5 w-3.5 shrink-0 text-emerald-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-            />
-          </svg>
-          <span>
-            <strong>{t('ver.immutableRuleTitle')}</strong>{' '}
-            {t('ver.immutableRuleText')}
-          </span>
         </div>
       )}
     </div>

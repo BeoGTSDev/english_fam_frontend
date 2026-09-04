@@ -30,6 +30,25 @@ export function AdminShell({
 }: AdminShellProps) {
   const { language, setLanguage, t } = useLanguage()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('ef_sidebar_collapsed') === 'true'
+    } catch {
+      return false
+    }
+  })
+
+  const toggleSidebar = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev
+      try {
+        localStorage.setItem('ef_sidebar_collapsed', String(next))
+      } catch {
+        // ignore localStorage errors
+      }
+      return next
+    })
+  }
 
   const navItems: NavItem[] = [
     {
@@ -38,7 +57,7 @@ export function AdminShell({
       flowId: 'UF-ADM-006',
       icon: (
         <svg
-          className="h-4 w-4"
+          className="h-4 w-4 shrink-0"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -58,7 +77,7 @@ export function AdminShell({
       flowId: 'UF-ADM-001',
       icon: (
         <svg
-          className="h-4 w-4"
+          className="h-4 w-4 shrink-0"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -78,7 +97,7 @@ export function AdminShell({
       flowId: 'UF-ADM-002',
       icon: (
         <svg
-          className="h-4 w-4"
+          className="h-4 w-4 shrink-0"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -98,7 +117,7 @@ export function AdminShell({
       flowId: 'UF-ADM-003',
       icon: (
         <svg
-          className="h-4 w-4"
+          className="h-4 w-4 shrink-0"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -118,7 +137,7 @@ export function AdminShell({
       flowId: 'UF-ADM-004',
       icon: (
         <svg
-          className="h-4 w-4"
+          className="h-4 w-4 shrink-0"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -138,7 +157,7 @@ export function AdminShell({
       flowId: 'UF-ADM-005',
       icon: (
         <svg
-          className="h-4 w-4"
+          className="h-4 w-4 shrink-0"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -158,7 +177,7 @@ export function AdminShell({
       flowId: 'UF-ADM-006',
       icon: (
         <svg
-          className="h-4 w-4"
+          className="h-4 w-4 shrink-0"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -180,42 +199,92 @@ export function AdminShell({
   }
 
   return (
-    <div className="min-h-screen bg-slate-100/90 text-slate-900 flex flex-col lg:flex-row antialiased">
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex lg:w-68 lg:flex-col lg:fixed lg:inset-y-0 border-r border-slate-800 bg-[#0B132B] z-20 shadow-lg">
-        {/* Brand with Logo */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-800/80 bg-slate-950/40">
-          <img
-            src="/englishfam-logo.png"
-            alt="EnglishFam Logo"
-            className="h-8 w-auto object-contain rounded-md bg-white p-0.5 shadow-xs"
-          />
-          <div className="overflow-hidden">
-            <h1 className="text-xs font-bold tracking-tight text-white flex items-center gap-1.5 leading-tight">
-              EnglishFam
-              <span className="text-[9px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-400 border border-blue-500/30 px-1 py-0.2 rounded">
-                Admin
-              </span>
-            </h1>
-            <span className="text-[10px] text-slate-400 font-medium block truncate">
-              {t('brand.subtitle')}
-            </span>
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col lg:flex-row antialiased">
+      {/* Desktop Sidebar (Collapsible: w-64 vs w-16) */}
+      <aside
+        className={`hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 border-r border-slate-800 bg-[#0B132B] z-20 transition-all duration-200 ease-in-out ${
+          isCollapsed ? 'lg:w-16' : 'lg:w-64'
+        }`}
+      >
+        {/* Brand with Logo & Collapse Button */}
+        <div
+          className={`flex items-center border-b border-slate-800/80 bg-slate-950/40 py-3 ${
+            isCollapsed ? 'justify-center px-2' : 'justify-between px-3.5'
+          }`}
+        >
+          <div className="flex items-center gap-2.5 overflow-hidden">
+            <img
+              src="/englishfam-logo.png"
+              alt="EnglishFam Logo"
+              className="h-7 w-auto object-contain rounded bg-white p-0.5 shrink-0"
+            />
+            {!isCollapsed && (
+              <div className="overflow-hidden">
+                <h1 className="text-xs font-bold tracking-tight text-white flex items-center gap-1.5 leading-tight">
+                  EnglishFam
+                  <span className="text-[9px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-400 border border-blue-500/30 px-1 py-0.2 rounded">
+                    Admin
+                  </span>
+                </h1>
+                <span className="text-[10px] text-slate-400 font-medium block truncate">
+                  {t('brand.subtitle')}
+                </span>
+              </div>
+            )}
           </div>
+
+          {/* Toggle button inside sidebar header */}
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            aria-label={isCollapsed ? 'Mở rộng sidebar' : 'Thu gọn sidebar'}
+            title={isCollapsed ? 'Mở rộng thanh bên' : 'Thu gọn thanh bên'}
+            className="rounded p-1 text-slate-400 hover:text-white hover:bg-slate-800/80 cursor-pointer transition-colors"
+          >
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              {isCollapsed ? (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M13 5l7 7-7 7M5 5l7 7-7 7"
+                />
+              ) : (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
+                />
+              )}
+            </svg>
+          </button>
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
-          <div className="px-2.5 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-            {t('nav.section')}
-          </div>
+        <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-1">
+          {!isCollapsed && (
+            <div className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              {t('nav.section')}
+            </div>
+          )}
           {navItems.map((item) => {
             const isActive = currentTab === item.id
+            const labelText = t(item.labelKey)
             return (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => handleTabClick(item.id)}
-                className={`w-full flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium transition-all duration-150 cursor-pointer ${
+                title={isCollapsed ? labelText : undefined}
+                className={`w-full flex items-center rounded-lg py-2 text-xs font-medium transition-all duration-150 cursor-pointer ${
+                  isCollapsed ? 'justify-center px-0' : 'gap-2.5 px-2.5'
+                } ${
                   isActive
                     ? 'bg-blue-600 text-white font-semibold shadow-xs shadow-blue-500/30'
                     : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
@@ -224,10 +293,14 @@ export function AdminShell({
                 <span className={isActive ? 'text-white' : 'text-slate-400'}>
                   {item.icon}
                 </span>
-                <span className="flex-1 text-left truncate">
-                  {t(item.labelKey)}
+                <span
+                  className={
+                    isCollapsed ? 'sr-only' : 'flex-1 text-left truncate'
+                  }
+                >
+                  {labelText}
                 </span>
-                {item.id === 'curriculum' && (
+                {!isCollapsed && item.id === 'curriculum' && (
                   <span
                     className={`rounded text-[10px] font-mono px-1.5 py-0.5 ${
                       isActive
@@ -244,14 +317,29 @@ export function AdminShell({
         </nav>
 
         {/* Capability info footer */}
-        <div className="p-3 m-3 rounded-lg border border-slate-800 bg-slate-950/60">
+        <div
+          className={`border-t border-slate-800 bg-slate-950/60 ${
+            isCollapsed
+              ? 'p-2.5 flex justify-center'
+              : 'p-3 m-2.5 rounded-lg border'
+          }`}
+          title="admin:curriculum:manage, admin:account:provision"
+        >
           <div className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[11px] font-semibold text-slate-200">
-              {t('nav.capability')}
-            </span>
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            {!isCollapsed && (
+              <span className="text-[11px] font-semibold text-slate-200">
+                {t('nav.capability')}
+              </span>
+            )}
           </div>
-          <p className="mt-1 font-mono text-[10px] text-slate-400 leading-tight">
+          <p
+            className={
+              isCollapsed
+                ? 'sr-only'
+                : 'mt-1 font-mono text-[10px] text-slate-400 leading-tight'
+            }
+          >
             admin:curriculum:manage
             <br />
             admin:account:provision
@@ -350,25 +438,53 @@ export function AdminShell({
         </div>
       )}
 
-      {/* Main Content Area */}
-      <div className="flex-1 lg:pl-68 flex flex-col min-h-screen">
+      {/* Main Content Area (Dynamic padding for collapsed/expanded sidebar) */}
+      <div
+        className={`flex-1 flex flex-col min-h-screen transition-all duration-200 ease-in-out ${
+          isCollapsed ? 'lg:pl-16' : 'lg:pl-64'
+        }`}
+      >
         {/* Top bar for desktop */}
-        <div className="hidden lg:flex items-center justify-between border-b border-slate-200/80 bg-white px-6 py-2.5 sticky top-0 z-10 shadow-2xs">
+        <div className="hidden lg:flex items-center justify-between border-b border-slate-200/80 bg-white px-5 py-2 sticky top-0 z-10">
           <div className="flex items-center gap-2 text-xs text-slate-500">
-            <span className="font-medium">Admin</span>
+            {/* Sidebar toggle button in topbar */}
+            <button
+              type="button"
+              onClick={toggleSidebar}
+              aria-label={
+                isCollapsed ? 'Mở rộng thanh bên' : 'Thu gọn thanh bên'
+              }
+              title={isCollapsed ? 'Mở rộng thanh bên' : 'Thu gọn thanh bên'}
+              className="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer mr-1"
+            >
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h16M4 18h11"
+                />
+              </svg>
+            </button>
+            <span className="font-medium text-slate-400">Admin</span>
             <span className="text-slate-300">/</span>
             <span className="font-semibold text-slate-800">
               {t(navItems.find((n) => n.id === currentTab)?.labelKey || '')}
             </span>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {/* Professional Capsule Language Switcher */}
-            <div className="inline-flex items-center rounded-full border border-slate-200/90 bg-slate-100 p-0.5 text-xs font-semibold shadow-2xs">
+            <div className="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 p-0.5 text-xs font-semibold">
               <button
                 type="button"
                 onClick={() => setLanguage('vi')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full transition-all duration-150 cursor-pointer text-xs ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-all duration-150 cursor-pointer text-xs ${
                   language === 'vi'
                     ? 'bg-white text-blue-700 font-bold shadow-xs'
                     : 'text-slate-600 hover:text-slate-900 font-medium'
@@ -388,7 +504,7 @@ export function AdminShell({
               <button
                 type="button"
                 onClick={() => setLanguage('en')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-full transition-all duration-150 cursor-pointer text-xs ${
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full transition-all duration-150 cursor-pointer text-xs ${
                   language === 'en'
                     ? 'bg-white text-blue-700 font-bold shadow-xs'
                     : 'text-slate-600 hover:text-slate-900 font-medium'
@@ -409,14 +525,14 @@ export function AdminShell({
 
             {/* Profile avatar */}
             <div className="flex items-center gap-2 pl-3 border-l border-slate-200">
-              <div className="h-7 w-7 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-bold text-xs flex items-center justify-center shadow-xs">
+              <div className="h-7 w-7 rounded-full bg-slate-800 text-white font-bold text-xs flex items-center justify-center">
                 AD
               </div>
               <div className="text-left leading-tight">
                 <div className="text-xs font-bold text-slate-800">
                   {t('profile.role')}
                 </div>
-                <div className="text-[11px] text-slate-400">
+                <div className="text-[10px] text-slate-400">
                   {t('profile.email')}
                 </div>
               </div>
@@ -424,8 +540,12 @@ export function AdminShell({
           </div>
         </div>
 
-        {/* Content body */}
-        <main className="flex-1 p-3 sm:p-4 lg:p-5">{children}</main>
+        {/* Content body - Fixed stable container so toggling sidebar does not break layout */}
+        <main className="flex-1 p-3 sm:p-4 lg:p-5">
+          <div className="max-w-6xl mx-auto w-full transition-all duration-200">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   )

@@ -153,24 +153,30 @@ export function AdminCurriculumPage() {
           </Button>
         </div>
 
-        {/* Curriculum Switcher Segmented Control */}
+        {/* Curriculum Switcher Minimalist Segmented Control */}
         <div className="flex flex-col gap-1.5">
-          <div className="inline-flex p-1 bg-slate-200/70 rounded-xl gap-1 max-w-full overflow-x-auto shadow-2xs [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <div className="inline-flex p-0.5 bg-slate-100/90 rounded-lg border border-slate-200/70 gap-1 max-w-full overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {curricula.map((c) => {
               const isSelected = c.id === selectedCurriculumId
               const badgeConfig =
                 c.id === 'curr-moet-gdpt'
-                  ? { label: 'GDPT', bg: 'bg-blue-100 text-blue-700' }
+                  ? {
+                      label: 'GDPT',
+                      bg: 'bg-blue-50 text-blue-700 border border-blue-200/60',
+                    }
                   : c.id === 'curr-ielts'
-                    ? { label: 'IELTS', bg: 'bg-amber-100 text-amber-700' }
+                    ? {
+                        label: 'IELTS',
+                        bg: 'bg-amber-50 text-amber-700 border border-amber-200/60',
+                      }
                     : c.id === 'curr-toeic'
                       ? {
                           label: 'TOEIC',
-                          bg: 'bg-emerald-100 text-emerald-700',
+                          bg: 'bg-emerald-50 text-emerald-700 border border-emerald-200/60',
                         }
                       : {
                           label: 'CAMBRIDGE',
-                          bg: 'bg-purple-100 text-purple-700',
+                          bg: 'bg-purple-50 text-purple-700 border border-purple-200/60',
                         }
 
               return (
@@ -178,14 +184,14 @@ export function AdminCurriculumPage() {
                   key={c.id}
                   type="button"
                   onClick={() => selectCurriculum(c.id)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     isSelected
-                      ? 'bg-white text-blue-700 shadow-xs ring-1 ring-slate-200/80 font-bold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                      ? 'bg-white text-slate-900 font-bold shadow-2xs border border-slate-200/80'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-medium'
                   }`}
                 >
                   <span
-                    className={`text-[9px] font-bold px-1.5 py-0.5 rounded tracking-wide ${badgeConfig.bg}`}
+                    className={`text-[9px] font-bold px-1.5 py-0.2 rounded tracking-wide ${badgeConfig.bg}`}
                   >
                     {badgeConfig.label}
                   </span>
