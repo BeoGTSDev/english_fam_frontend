@@ -39,7 +39,9 @@ function safeMessage(kind: AppErrorKind): string {
   }
 }
 
-async function readErrorEnvelope(response: Response): Promise<ApiErrorEnvelope> {
+async function readErrorEnvelope(
+  response: Response,
+): Promise<ApiErrorEnvelope> {
   try {
     const body = (await response.json()) as unknown
 
@@ -54,26 +56,35 @@ async function readErrorEnvelope(response: Response): Promise<ApiErrorEnvelope> 
   return {}
 }
 
-export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+export async function apiRequest<T>(
+  path: string,
+  init: RequestInit = {},
+): Promise<T> {
   const { apiBaseUrl } = readClientEnv()
 
   if (!apiBaseUrl) {
     throw new AppError('configuration', safeMessage('configuration'))
   }
 
-  const response = await fetch(`${apiBaseUrl.replace(/\/$/, '')}/${path.replace(/^\//, '')}`, {
-    ...init,
-    credentials: 'include',
-    headers: {
-      Accept: 'application/json',
-      ...init.headers,
+  const response = await fetch(
+    `${apiBaseUrl.replace(/\/$/, '')}/${path.replace(/^\//, '')}`,
+    {
+      ...init,
+      credentials: 'include',
+      headers: {
+        Accept: 'application/json',
+        ...init.headers,
+      },
     },
-  })
+  )
 
   if (!response.ok) {
     const kind = classifyStatus(response.status)
     const { code } = await readErrorEnvelope(response)
-    throw new AppError(kind, safeMessage(kind), { status: response.status, code })
+    throw new AppError(kind, safeMessage(kind), {
+      status: response.status,
+      code,
+    })
   }
 
   if (response.status === 204) {
