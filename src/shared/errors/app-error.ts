@@ -14,7 +14,11 @@ export class AppError extends Error {
   readonly status?: number
   readonly code?: string
 
-  constructor(kind: AppErrorKind, message: string, options?: { status?: number; code?: string }) {
+  constructor(
+    kind: AppErrorKind,
+    message: string,
+    options?: { status?: number; code?: string },
+  ) {
     super(message)
     this.name = 'AppError'
     this.kind = kind
