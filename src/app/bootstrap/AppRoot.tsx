@@ -1,10 +1,10 @@
 import { useState } from 'react'
+import { LanguageProvider } from '../context/LanguageContext'
 import { AdminShell, type AdminTab } from '../layouts/AdminShell'
 import { AdminCurriculumPage } from '../../features/curriculum/pages/admin-curriculum.page'
 import { AdminSurfacePlaceholder } from '../../features/admin/components/AdminSurfacePlaceholder'
 
-export function AppRoot() {
-  // Default to 'curriculum' as requested for ticket EFA-198
+function AdminApp() {
   const [activeTab, setActiveTab] = useState<AdminTab>('curriculum')
 
   return (
@@ -18,5 +18,13 @@ export function AppRoot() {
         />
       )}
     </AdminShell>
+  )
+}
+
+export function AppRoot() {
+  return (
+    <LanguageProvider>
+      <AdminApp />
+    </LanguageProvider>
   )
 }

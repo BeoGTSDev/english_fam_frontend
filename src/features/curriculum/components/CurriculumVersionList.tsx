@@ -1,3 +1,4 @@
+import { useLanguage } from '../../../app/context/LanguageContext'
 import { Badge } from '../../../shared/components/ui/Badge'
 import { Button } from '../../../shared/components/ui/Button'
 import type { CurriculumVersion } from '../types/curriculum.types'
@@ -21,6 +22,7 @@ export function CurriculumVersionList({
   onApproveClick,
   onTriggerConflict,
 }: CurriculumVersionListProps) {
+  const { t } = useLanguage()
   const selectedVersion = versions.find((v) => v.id === selectedVersionId)
 
   const statusVariant = (status: CurriculumVersion['status']) => {
@@ -39,24 +41,24 @@ export function CurriculumVersionList({
   const statusLabel = (status: CurriculumVersion['status']) => {
     switch (status) {
       case 'APPROVED':
-        return 'Đã ban hành (APPROVED)'
+        return t('ver.statusApproved')
       case 'DRAFT':
-        return 'Bản thảo (DRAFT)'
+        return t('ver.statusDraft')
       case 'DEPRECATED':
-        return 'Hết hiệu lực (DEPRECATED)'
+        return t('ver.statusDeprecated')
       default:
         return status
     }
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
+    <div className="rounded-xl border border-slate-200/90 bg-white p-5 shadow-xs">
       {/* Top action row */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <h2 className="text-base font-bold text-slate-900">
-              Phiên bản chương trình (Curriculum Versions)
+            <h2 className="text-sm font-bold text-slate-900">
+              {t('ver.title')}
             </h2>
             {selectedVersion && (
               <Badge variant={statusVariant(selectedVersion.status)}>
@@ -64,9 +66,8 @@ export function CurriculumVersionList({
               </Badge>
             )}
           </div>
-          <p className="mt-1 text-xs text-slate-500">
-            Quản trị phiên bản theo phả hệ văn bản pháp quy Bộ GD&ĐT. Lịch sử
-            được bảo toàn bất biến.
+          <p className="mt-1 text-xs text-slate-500 font-medium">
+            {t('ver.subtitle')}
           </p>
         </div>
 
@@ -91,7 +92,7 @@ export function CurriculumVersionList({
               </svg>
             }
           >
-            Thẩm định cấu trúc
+            {t('ver.validateBtn')}
           </Button>
 
           {selectedVersion?.status === 'DRAFT' && (
@@ -115,7 +116,7 @@ export function CurriculumVersionList({
                 </svg>
               }
             >
-              Phê duyệt ban hành
+              {t('ver.approveBtn')}
             </Button>
           )}
 
@@ -139,10 +140,9 @@ export function CurriculumVersionList({
               </svg>
             }
           >
-            Tạo bản mới
+            {t('ver.createBtn')}
           </Button>
 
-          {/* Conflict simulator helper button for testing/demo */}
           <Button
             variant="ghost"
             size="sm"
@@ -150,7 +150,7 @@ export function CurriculumVersionList({
             onClick={onTriggerConflict}
             className="text-xs text-slate-400 hover:text-purple-600"
           >
-            Test xung đột
+            {t('ver.testConflict')}
           </Button>
         </div>
       </div>
@@ -164,13 +164,13 @@ export function CurriculumVersionList({
               key={ver.id}
               type="button"
               onClick={() => onSelectVersion(ver.id)}
-              className={`flex items-center gap-2 rounded-lg border px-3.5 py-2 text-xs font-medium transition-colors cursor-pointer min-h-[44px] ${
+              className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-semibold transition-all cursor-pointer min-h-[40px] ${
                 isSelected
-                  ? 'border-blue-600 bg-blue-50/70 text-blue-900 ring-1 ring-blue-600'
-                  : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                  ? 'border-blue-600 bg-blue-50/80 text-blue-900 shadow-2xs'
+                  : 'border-slate-200 bg-slate-50/70 text-slate-700 hover:bg-slate-100 hover:border-slate-300'
               }`}
             >
-              <span className="font-semibold">{ver.version_label}</span>
+              <span>{ver.version_label}</span>
               <span
                 className={`h-2 w-2 rounded-full ${
                   ver.status === 'APPROVED'
@@ -187,24 +187,24 @@ export function CurriculumVersionList({
 
       {/* Metadata panel */}
       {selectedVersion && (
-        <div className="mt-4 rounded-lg bg-slate-50 p-3.5 text-xs text-slate-600 border border-slate-100 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-3.5 rounded-lg bg-slate-50/90 p-3 text-xs text-slate-600 border border-slate-200/60 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <div>
-              <span className="text-slate-400">Văn bản căn cứ:</span>{' '}
-              <strong className="text-slate-800">
+              <span className="text-slate-400">{t('ver.legalRef')}</span>{' '}
+              <strong className="text-slate-800 font-semibold">
                 {selectedVersion.document_reference}
               </strong>
             </div>
             <div>
-              <span className="text-slate-400">Hiệu lực từ:</span>{' '}
-              <strong className="text-slate-800">
+              <span className="text-slate-400">{t('ver.effectiveFrom')}</span>{' '}
+              <strong className="text-slate-800 font-semibold">
                 {selectedVersion.effective_from}
               </strong>
             </div>
             {selectedVersion.supersedes_version_id && (
               <div>
-                <span className="text-slate-400">Thay thế bản:</span>{' '}
-                <strong className="text-slate-800">
+                <span className="text-slate-400">{t('ver.supersedes')}</span>{' '}
+                <strong className="text-slate-800 font-semibold">
                   {selectedVersion.supersedes_version_id}
                 </strong>
               </div>
@@ -224,7 +224,7 @@ export function CurriculumVersionList({
 
       {/* Immutability guidance */}
       {selectedVersion?.status === 'APPROVED' && (
-        <div className="mt-3 flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50/60 border border-emerald-200/60 rounded-md px-3 py-1.5">
+        <div className="mt-3 flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50/70 border border-emerald-200/80 rounded-lg px-3.5 py-2">
           <svg
             className="h-4 w-4 shrink-0 text-emerald-600"
             fill="none"
@@ -239,9 +239,8 @@ export function CurriculumVersionList({
             />
           </svg>
           <span>
-            <strong>Quy tắc bất biến:</strong> Phiên bản này đã được công bố
-            chính thức. Dữ liệu chuẩn đầu ra và ánh xạ là bất biến để bảo vệ
-            lịch sử học tập của học sinh.
+            <strong>{t('ver.immutableRuleTitle')}</strong>{' '}
+            {t('ver.immutableRuleText')}
           </span>
         </div>
       )}

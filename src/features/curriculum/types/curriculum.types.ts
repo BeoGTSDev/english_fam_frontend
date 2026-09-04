@@ -22,13 +22,28 @@ export type SkillDomain =
   | 'VOCABULARY'
   | 'PRONUNCIATION'
 
+export type CurriculumCategory =
+  | 'MOET_NATIONAL'
+  | 'INTERNATIONAL_CERTIFICATE'
+  | 'PROFICIENCY_FRAMEWORK'
+
+export type SchoolLevelGroup =
+  | 'PRIMARY' // Lớp 1 - 5
+  | 'SECONDARY' // Lớp 6 - 9
+  | 'HIGH' // Lớp 10 - 12
+  | 'BAND' // IELTS / TOEIC Bands
+  | 'LEVEL' // CEFR / Cambridge
+
 export interface Curriculum {
   id: string
   curriculum_code: string
   name_en: string
   name_vi: string
   authority_name: string
+  category: CurriculumCategory
   status: 'ACTIVE' | 'ARCHIVED'
+  description_vi?: string
+  description_en?: string
 }
 
 export interface CurriculumVersion {
@@ -58,6 +73,7 @@ export interface Grade {
   display_order: number
   name_en: string
   name_vi: string
+  level_group: SchoolLevelGroup
 }
 
 export interface SkillSummary {

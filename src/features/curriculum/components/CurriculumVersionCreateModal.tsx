@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLanguage } from '../../../app/context/LanguageContext'
 import { Button } from '../../../shared/components/ui/Button'
 import { Input } from '../../../shared/components/ui/Input'
 import { Modal } from '../../../shared/components/ui/Modal'
@@ -23,6 +24,7 @@ export function CurriculumVersionCreateModal({
   existingVersions,
   onCreate,
 }: CurriculumVersionCreateModalProps) {
+  const { t } = useLanguage()
   const [versionLabel, setVersionLabel] = useState('')
   const [documentRef, setDocumentRef] = useState('')
   const [effectiveFrom, setEffectiveFrom] = useState(
@@ -67,8 +69,8 @@ export function CurriculumVersionCreateModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Tạo phiên bản chương trình mới (New Curriculum Version)"
-      description="Tuân thủ quy tắc bảo toàn lịch sử: Phiên bản mới sẽ kế thừa và ghi nhận phiên bản tiền nhiệm."
+      title={t('modal.createTitle')}
+      description={t('modal.createSubtitle')}
       footer={
         <>
           <Button
@@ -77,7 +79,7 @@ export function CurriculumVersionCreateModal({
             onClick={onClose}
             disabled={isSubmitting}
           >
-            Hủy
+            {t('modal.cancel')}
           </Button>
           <Button
             variant="primary"
@@ -85,7 +87,7 @@ export function CurriculumVersionCreateModal({
             isLoading={isSubmitting}
             onClick={handleSubmit}
           >
-            Tạo phiên bản
+            {t('modal.submitCreate')}
           </Button>
         </>
       }
@@ -98,7 +100,7 @@ export function CurriculumVersionCreateModal({
         )}
 
         <Input
-          label="Tên phiên bản (*) — VD: v2.1 (TT 17/2025/TT-BGDĐT)"
+          label={t('modal.versionLabel')}
           value={versionLabel}
           onChange={(e) => setVersionLabel(e.target.value)}
           placeholder="v2.1..."
@@ -106,7 +108,7 @@ export function CurriculumVersionCreateModal({
         />
 
         <Input
-          label="Văn bản pháp quy / Căn cứ ban hành (*)"
+          label={t('modal.documentRef')}
           value={documentRef}
           onChange={(e) => setDocumentRef(e.target.value)}
           placeholder="Thông tư 17/2025/TT-BGDĐT..."
@@ -116,18 +118,18 @@ export function CurriculumVersionCreateModal({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Input
             type="date"
-            label="Ngày bắt đầu hiệu lực (*)"
+            label={t('modal.effectiveDate')}
             value={effectiveFrom}
             onChange={(e) => setEffectiveFrom(e.target.value)}
             required
           />
 
           <Select
-            label="Thay thế phiên bản tiền nhiệm (Supersedes)"
+            label={t('modal.supersedesSelect')}
             value={supersedesId}
             onChange={(e) => setSupersedesId(e.target.value)}
           >
-            <option value="">-- Không thay thế (Khởi tạo mới) --</option>
+            <option value="">{t('modal.noSupersede')}</option>
             {existingVersions.map((v) => (
               <option key={v.id} value={v.id}>
                 {v.version_label} ({v.status})
@@ -138,7 +140,7 @@ export function CurriculumVersionCreateModal({
 
         <div className="flex flex-col gap-1.5">
           <label className="text-xs font-semibold uppercase tracking-wider text-slate-700">
-            Lý do cập nhật / Ghi chú sửa đổi (*)
+            {t('modal.changeReason')}
           </label>
           <textarea
             rows={3}
@@ -150,10 +152,8 @@ export function CurriculumVersionCreateModal({
           />
         </div>
 
-        <div className="rounded-lg bg-blue-50 p-3 text-xs text-blue-800 border border-blue-100">
-          🔒 <strong>Bảo toàn lịch sử:</strong> Phiên bản mới sẽ khởi tạo ở
-          trạng thái <code>DRAFT</code> để Admin thẩm định trước khi phê duyệt
-          ban hành.
+        <div className="rounded-lg bg-blue-50/80 p-3 text-xs text-blue-800 border border-blue-100">
+          🔒 <strong>{t('modal.historyNote')}</strong>
         </div>
       </form>
     </Modal>

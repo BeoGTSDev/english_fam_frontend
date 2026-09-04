@@ -8,15 +8,22 @@ import type {
   LearningOutcome,
   MappingImportance,
   MappingRole,
+  SchoolLevelGroup,
   SkillSummary,
   ValidateCurriculumVersionResponse,
 } from '../types/curriculum.types'
 
+export type LevelGroupFilter = 'ALL' | SchoolLevelGroup
+
 export function useCurriculum() {
-  const [curriculum, setCurriculum] = useState<Curriculum | null>(null)
+  const [curricula, setCurricula] = useState<Curriculum[]>([])
+  const [selectedCurriculumId, setSelectedCurriculumId] =
+    useState<string>('curr-moet-gdpt')
   const [versions, setVersions] = useState<CurriculumVersion[]>([])
   const [selectedVersionId, setSelectedVersionId] = useState<string>('')
   const [grades, setGrades] = useState<Grade[]>([])
+  const [selectedLevelGroup, setSelectedLevelGroup] =
+    useState<LevelGroupFilter>('ALL')
   const [selectedGradeId, setSelectedGradeId] = useState<string>('')
   const [outcomes, setOutcomes] = useState<LearningOutcome[]>([])
   const [skills, setSkills] = useState<SkillSummary[]>([])
@@ -30,26 +37,17 @@ export function useCurriculum() {
   const [hasPermission, setHasPermission] = useState<boolean>(true)
   const [searchQuery, setSearchQuery] = useState<string>('')
 
-  // 1. Initial Load: Curriculum, Versions, and Skills
+  // 1. Load All Curricula and initial Skills
   const loadInitialData = useCallback(async () => {
     setIsLoading(true)
     setError(null)
     try {
-      const [currData, verData, skillData] = await Promise.all([
-        curriculumApi.getCurriculum(),
-        curriculumApi.getVersions(),
+      const [curriculaList, skillData] = await Promise.all([
+        curriculumApi.getCurricula(),
         curriculumApi.getAllSkills(),
       ])
-      setCurriculum(currData)
-      setVersions(verData)
+      setCurricula(curriculaList)
       setSkills(skillData)
-
-      // Default select the latest approved or current draft version
-      const activeVersion =
-        verData.find((v) => v.status === 'APPROVED') || verData[0]
-      if (activeVersion) {
-        setSelectedVersionId(activeVersion.id)
-      }
     } catch {
       setError('Không thể tải danh mục chương trình học. Vui lòng thử lại.')
     } finally {
@@ -61,7 +59,33 @@ export function useCurriculum() {
     loadInitialData()
   }, [loadInitialData])
 
-  // 2. When selectedVersionId changes: fetch Grades
+  // 2. When selectedCurriculumId changes: fetch its versions
+  useEffect(() => {
+    if (!selectedCurriculumId) return
+
+    let isMounted = true
+    curriculumApi.getVersions(selectedCurriculumId).then((verData) => {
+      if (!isMounted) return
+      setVersions(verData)
+
+      const activeVersion =
+        verData.find((v) => v.status === 'APPROVED') || verData[0]
+      if (activeVersion) {
+        setSelectedVersionId(activeVersion.id)
+      } else {
+        setSelectedVersionId('')
+        setGrades([])
+        setSelectedGradeId('')
+        setOutcomes([])
+      }
+    })
+
+    return () => {
+      isMounted = false
+    }
+  }, [selectedCurriculumId])
+
+  // 3. When selectedVersionId changes: fetch Grades
   useEffect(() => {
     if (!selectedVersionId) return
 
@@ -69,8 +93,13 @@ export function useCurriculum() {
     curriculumApi.getGrades(selectedVersionId).then((gradeList) => {
       if (!isMounted) return
       setGrades(gradeList)
+      setSelectedLevelGroup('ALL')
+
       if (gradeList.length > 0) {
-        setSelectedGradeId(gradeList[0].id)
+        // Default to Grade 6 if available, or the first grade
+        const defaultGrade =
+          gradeList.find((g) => g.grade_code === 'G6') || gradeList[0]
+        setSelectedGradeId(defaultGrade.id)
       } else {
         setSelectedGradeId('')
         setOutcomes([])
@@ -82,7 +111,7 @@ export function useCurriculum() {
     }
   }, [selectedVersionId])
 
-  // 3. When selectedGradeId changes: fetch Outcomes
+  // 4. When selectedGradeId changes: fetch Outcomes
   useEffect(() => {
     if (!selectedGradeId) {
       setOutcomes([])
@@ -100,6 +129,14 @@ export function useCurriculum() {
     }
   }, [selectedGradeId])
 
+  const selectedCurriculum = useMemo(() => {
+    return (
+      curricula.find((c) => c.id === selectedCurriculumId) ||
+      curricula[0] ||
+      null
+    )
+  }, [curricula, selectedCurriculumId])
+
   const selectedVersion = useMemo(() => {
     return versions.find((v) => v.id === selectedVersionId) || null
   }, [versions, selectedVersionId])
@@ -107,6 +144,12 @@ export function useCurriculum() {
   const selectedGrade = useMemo(() => {
     return grades.find((g) => g.id === selectedGradeId) || null
   }, [grades, selectedGradeId])
+
+  // Grades filtered by Level Group (All, Primary, Secondary, High, etc.)
+  const filteredGrades = useMemo(() => {
+    if (selectedLevelGroup === 'ALL') return grades
+    return grades.filter((g) => g.level_group === selectedLevelGroup)
+  }, [grades, selectedLevelGroup])
 
   // Filtered outcomes by search
   const filteredOutcomes = useMemo(() => {
@@ -126,6 +169,14 @@ export function useCurriculum() {
   }, [outcomes, searchQuery])
 
   // Actions
+  const handleSelectCurriculum = useCallback((id: string) => {
+    setSelectedCurriculumId(id)
+    setValidationResult(null)
+    setHasConflict(false)
+    setSuccessMessage(null)
+    setSearchQuery('')
+  }, [])
+
   const handleSelectVersion = useCallback((versionId: string) => {
     setSelectedVersionId(versionId)
     setValidationResult(null)
@@ -270,11 +321,17 @@ export function useCurriculum() {
   }, [])
 
   return {
-    curriculum,
+    curricula,
+    selectedCurriculumId,
+    selectedCurriculum,
+    curriculum: selectedCurriculum,
     versions,
     selectedVersionId,
     selectedVersion,
-    grades,
+    grades: filteredGrades,
+    allGrades: grades,
+    selectedLevelGroup,
+    setSelectedLevelGroup,
     selectedGradeId,
     selectedGrade,
     outcomes: filteredOutcomes,
@@ -290,6 +347,7 @@ export function useCurriculum() {
     setSearchQuery,
     setSuccessMessage,
     setError,
+    selectCurriculum: handleSelectCurriculum,
     selectVersion: handleSelectVersion,
     selectGrade: handleSelectGrade,
     createVersion: handleCreateVersion,

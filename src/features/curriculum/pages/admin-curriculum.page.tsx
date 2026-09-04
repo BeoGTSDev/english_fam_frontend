@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLanguage } from '../../../app/context/LanguageContext'
 import { Alert } from '../../../shared/components/ui/Alert'
 import { Button } from '../../../shared/components/ui/Button'
 import { ConflictBanner } from '../components/ConflictBanner'
@@ -10,12 +11,19 @@ import { useCurriculum } from '../hooks/use-curriculum'
 import type { LearningOutcome } from '../types/curriculum.types'
 
 export function AdminCurriculumPage() {
+  const { language, t } = useLanguage()
+
   const {
-    curriculum,
+    curricula,
+    selectedCurriculumId,
+    selectedCurriculum,
     versions,
     selectedVersionId,
     selectedVersion,
     grades,
+    allGrades,
+    selectedLevelGroup,
+    setSelectedLevelGroup,
     selectedGradeId,
     outcomes,
     skills,
@@ -28,6 +36,7 @@ export function AdminCurriculumPage() {
     searchQuery,
     setSearchQuery,
     setSuccessMessage,
+    selectCurriculum,
     selectVersion,
     selectGrade,
     createVersion,
@@ -49,10 +58,10 @@ export function AdminCurriculumPage() {
   if (!hasPermission) {
     return (
       <div className="mx-auto max-w-4xl p-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-xs flex flex-col items-center">
-          <div className="rounded-full bg-rose-50 p-4 text-rose-600">
+        <div className="rounded-2xl border border-slate-200/90 bg-white p-10 text-center shadow-xs flex flex-col items-center">
+          <div className="rounded-full bg-rose-50 p-3.5 text-rose-600">
             <svg
-              className="h-8 w-8"
+              className="h-7 w-7"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -65,22 +74,19 @@ export function AdminCurriculumPage() {
               />
             </svg>
           </div>
-          <h2 className="mt-4 text-xl font-bold text-slate-900">
-            Không có quyền truy cập (Permission Denied)
+          <h2 className="mt-4 text-lg font-bold text-slate-900">
+            {t('notif.deniedTitle')}
           </h2>
-          <p className="mt-2 text-sm text-slate-500 max-w-md">
-            Tài khoản quản trị của bạn không có capability{' '}
-            <code>admin:curriculum:manage</code>. Theo nguyên tắc đặc quyền tối
-            thiểu (Least Privilege), bạn không thể xem hoặc chỉnh sửa khung
-            chương trình học.
+          <p className="mt-2 text-xs text-slate-500 max-w-md leading-relaxed">
+            {t('notif.deniedDesc')}
           </p>
-          <div className="mt-6">
+          <div className="mt-5">
             <Button
               variant="secondary"
               size="sm"
               onClick={togglePermissionForTesting}
             >
-              Bật lại quyền (Dành cho kiểm thử UI)
+              {t('curr.permissionRestored')}
             </Button>
           </div>
         </div>
@@ -91,10 +97,10 @@ export function AdminCurriculumPage() {
   // 2. Loading State (Skeleton)
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-6xl p-6 space-y-6 animate-pulse">
-        <div className="h-8 w-64 bg-slate-200 rounded-md" />
-        <div className="h-32 bg-slate-100 rounded-xl border border-slate-200" />
-        <div className="h-96 bg-slate-100 rounded-xl border border-slate-200" />
+      <div className="mx-auto max-w-6xl space-y-5 animate-pulse">
+        <div className="h-7 w-64 bg-slate-200 rounded-md" />
+        <div className="h-28 bg-white rounded-xl border border-slate-200" />
+        <div className="h-80 bg-white rounded-xl border border-slate-200" />
       </div>
     )
   }
@@ -102,13 +108,13 @@ export function AdminCurriculumPage() {
   // 3. Error + Retry State
   if (error && versions.length === 0) {
     return (
-      <div className="mx-auto max-w-4xl p-6">
+      <div className="mx-auto max-w-4xl">
         <Alert
           type="danger"
-          title="Lỗi kết nối / Tải dữ liệu"
+          title={t('notif.error')}
           action={
             <Button variant="primary" size="sm" onClick={reload}>
-              Thử lại (Retry)
+              {t('notif.retry')}
             </Button>
           }
         >
@@ -121,34 +127,21 @@ export function AdminCurriculumPage() {
   const isVersionApproved = selectedVersion?.status === 'APPROVED'
 
   return (
-    <div className="mx-auto max-w-6xl p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
-      {/* Page Header */}
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+    <div className="mx-auto max-w-6xl flex flex-col gap-4">
+      {/* Top Header & Curriculum Selector */}
+      <div className="rounded-xl border border-slate-200/90 bg-white p-5 shadow-xs flex flex-col gap-4">
+        {/* Category & Action row */}
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider text-blue-600">
-              Quản trị Khung chuẩn (Admin Curriculum)
+              {t('curr.category')}
             </span>
             <span className="text-slate-300">•</span>
             <span className="text-xs text-slate-500 font-mono">
               EFA-198 / UF-ADM-003
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 mt-1">
-            {curriculum?.name_vi ||
-              'Chương trình Giáo dục phổ thông môn Tiếng Anh'}
-          </h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Cơ quan ban hành: <strong>{curriculum?.authority_name}</strong> | Mã
-            định danh:{' '}
-            <code className="text-slate-700 font-mono">
-              {curriculum?.curriculum_code}
-            </code>
-          </p>
-        </div>
 
-        <div className="flex items-center gap-2">
-          {/* Helper toggle for testing permission denied state */}
           <Button
             variant="ghost"
             size="sm"
@@ -156,9 +149,70 @@ export function AdminCurriculumPage() {
             className="text-xs text-slate-400 hover:text-rose-600"
             title="Thử nghiệm trạng thái từ chối quyền (Permission Denied)"
           >
-            Mô phỏng từ chối quyền
+            {t('curr.simulateDenied')}
           </Button>
         </div>
+
+        {/* Curriculum Switcher Tabs */}
+        <div>
+          <label className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2 block">
+            {t('curr.selectProgram')}
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+            {curricula.map((c) => {
+              const isSelected = c.id === selectedCurriculumId
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => selectCurriculum(c.id)}
+                  className={`flex flex-col text-left p-3 rounded-xl border transition-all cursor-pointer min-h-[44px] ${
+                    isSelected
+                      ? 'border-blue-600 bg-blue-50/60 shadow-xs ring-1 ring-blue-600'
+                      : 'border-slate-200 bg-slate-50/60 hover:bg-slate-100/80 hover:border-slate-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="font-bold text-xs text-slate-900 line-clamp-1">
+                      {language === 'vi' ? c.name_vi : c.name_en}
+                    </span>
+                    {isSelected && (
+                      <span className="h-2 w-2 rounded-full bg-blue-600 shrink-0" />
+                    )}
+                  </div>
+                  <span className="text-xs font-mono text-slate-500 mt-1">
+                    {c.curriculum_code}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Active Curriculum Summary */}
+        {selectedCurriculum && (
+          <div className="rounded-lg bg-slate-50/80 p-3 text-xs text-slate-600 border border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <span className="text-slate-400">{t('curr.authority')}</span>{' '}
+              <strong className="text-slate-800 font-semibold">
+                {selectedCurriculum.authority_name}
+              </strong>
+              <span className="mx-2 text-slate-300">|</span>
+              <span className="text-slate-400">
+                {t('curr.identifier')}
+              </span>{' '}
+              <code className="text-slate-700 font-mono font-semibold">
+                {selectedCurriculum.curriculum_code}
+              </code>
+            </div>
+
+            <div className="text-slate-500 text-xs truncate max-w-md">
+              {language === 'vi'
+                ? selectedCurriculum.description_vi
+                : selectedCurriculum.description_en}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Notifications & Banners */}
@@ -168,7 +222,7 @@ export function AdminCurriculumPage() {
         <Alert
           type="success"
           onDismiss={() => setSuccessMessage(null)}
-          title="Thao tác thành công"
+          title={t('notif.success')}
         >
           {successMessage}
         </Alert>
@@ -213,6 +267,9 @@ export function AdminCurriculumPage() {
       {/* Section 2: Grades & Learning Outcomes Workspace */}
       <CurriculumGradeOutcomeTree
         grades={grades}
+        allGrades={allGrades}
+        selectedLevelGroup={selectedLevelGroup}
+        onSelectLevelGroup={setSelectedLevelGroup}
         selectedGradeId={selectedGradeId}
         onSelectGrade={selectGrade}
         outcomes={outcomes}
@@ -227,7 +284,7 @@ export function AdminCurriculumPage() {
       <CurriculumVersionCreateModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        curriculumId={curriculum?.id || 'curr-moet-gdpt'}
+        curriculumId={selectedCurriculumId}
         existingVersions={versions}
         onCreate={async (payload) => {
           await createVersion(payload)

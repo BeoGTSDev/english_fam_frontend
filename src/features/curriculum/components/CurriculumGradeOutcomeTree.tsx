@@ -1,10 +1,15 @@
+import { useLanguage } from '../../../app/context/LanguageContext'
 import { Badge } from '../../../shared/components/ui/Badge'
 import { Button } from '../../../shared/components/ui/Button'
 import { Input } from '../../../shared/components/ui/Input'
+import type { LevelGroupFilter } from '../hooks/use-curriculum'
 import type { Grade, LearningOutcome } from '../types/curriculum.types'
 
 export interface CurriculumGradeOutcomeTreeProps {
   grades: Grade[]
+  allGrades: Grade[]
+  selectedLevelGroup: LevelGroupFilter
+  onSelectLevelGroup: (group: LevelGroupFilter) => void
   selectedGradeId: string
   onSelectGrade: (id: string) => void
   outcomes: LearningOutcome[]
@@ -17,6 +22,9 @@ export interface CurriculumGradeOutcomeTreeProps {
 
 export function CurriculumGradeOutcomeTree({
   grades,
+  allGrades,
+  selectedLevelGroup,
+  onSelectLevelGroup,
   selectedGradeId,
   onSelectGrade,
   outcomes,
@@ -26,6 +34,8 @@ export function CurriculumGradeOutcomeTree({
   onRemoveMapping,
   isVersionApproved,
 }: CurriculumGradeOutcomeTreeProps) {
+  const { language, t } = useLanguage()
+
   const roleBadgeVariant = (role: string) => {
     switch (role) {
       case 'PRIMARY_TARGET':
@@ -40,9 +50,13 @@ export function CurriculumGradeOutcomeTree({
   const roleLabel = (role: string) => {
     switch (role) {
       case 'PRIMARY_TARGET':
-        return 'Trọng tâm'
+        return t('outcome.rolePrimary')
       case 'SECONDARY_TARGET':
-        return 'Bổ trợ'
+        return t('outcome.roleSecondary')
+      case 'PREREQUISITE_SUPPORT':
+        return t('outcome.rolePrereq')
+      case 'REVIEW_OR_REINFORCEMENT':
+        return t('outcome.roleReview')
       default:
         return role
     }
@@ -59,10 +73,18 @@ export function CurriculumGradeOutcomeTree({
     }
   }
 
+  // Check if current curriculum has school levels (MOET 1-12) or Bands/Certificates
+  const hasSchoolLevels = allGrades.some(
+    (g) =>
+      g.level_group === 'PRIMARY' ||
+      g.level_group === 'SECONDARY' ||
+      g.level_group === 'HIGH',
+  )
+
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs flex flex-col gap-5">
+    <div className="rounded-xl border border-slate-200/90 bg-white p-5 shadow-xs flex flex-col gap-4">
       {/* SSoT Rule Banner */}
-      <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50/50 p-3.5 text-xs text-blue-900 leading-relaxed">
+      <div className="flex items-start gap-3 rounded-lg border border-blue-200/80 bg-blue-50/70 p-3.5 text-xs text-blue-900 leading-relaxed">
         <svg
           className="h-4 w-4 shrink-0 text-blue-600 mt-0.5"
           fill="none"
@@ -77,18 +99,67 @@ export function CurriculumGradeOutcomeTree({
           />
         </svg>
         <div>
-          <strong>Quy tắc Benchmark không ép học lại (FR-CURR-004):</strong>{' '}
-          Chuẩn đầu ra và ánh xạ theo khối lớp đóng vai trò định vị mục tiêu
-          trường học. Hệ thống cá nhân hóa sẽ không ép học sinh học lại toàn bộ
-          một khối lớp nếu năng lực thực tế đã đạt hoặc cần lấp lỗ hổng ở mức độ
-          khác.
+          <strong>{t('ssot.ruleTitle')}</strong> {t('ssot.ruleText')}
         </div>
       </div>
 
-      {/* Grade selector and Search */}
+      {/* Level Group Selector (Tiểu học 1-5, THCS 6-9, THPT 10-12, hoặc Bands) */}
+      {hasSchoolLevels && (
+        <div className="flex flex-wrap items-center gap-1.5 border-b border-slate-100 pb-3">
+          <span className="text-xs font-bold text-slate-500 mr-2 uppercase tracking-wide">
+            {language === 'vi' ? 'Phân cấp học:' : 'Education Level:'}
+          </span>
+          <button
+            type="button"
+            onClick={() => onSelectLevelGroup('ALL')}
+            className={`rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer transition-colors ${
+              selectedLevelGroup === 'ALL'
+                ? 'bg-slate-800 text-white shadow-xs'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            {t('grade.filterAll')}
+          </button>
+          <button
+            type="button"
+            onClick={() => onSelectLevelGroup('PRIMARY')}
+            className={`rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer transition-colors ${
+              selectedLevelGroup === 'PRIMARY'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            {t('grade.filterPrimary')}
+          </button>
+          <button
+            type="button"
+            onClick={() => onSelectLevelGroup('SECONDARY')}
+            className={`rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer transition-colors ${
+              selectedLevelGroup === 'SECONDARY'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            {t('grade.filterSecondary')}
+          </button>
+          <button
+            type="button"
+            onClick={() => onSelectLevelGroup('HIGH')}
+            className={`rounded-lg px-3 py-1.5 text-xs font-semibold cursor-pointer transition-colors ${
+              selectedLevelGroup === 'HIGH'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            {t('grade.filterHigh')}
+          </button>
+        </div>
+      )}
+
+      {/* Grade tabs and Search row */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         {/* Grade tabs */}
-        <div className="flex flex-wrap gap-1.5 border-b border-slate-100 sm:border-0 pb-2 sm:pb-0">
+        <div className="flex flex-wrap gap-1.5 flex-1">
           {grades.map((grade) => {
             const isSelected = grade.id === selectedGradeId
             return (
@@ -96,24 +167,24 @@ export function CurriculumGradeOutcomeTree({
                 key={grade.id}
                 type="button"
                 onClick={() => onSelectGrade(grade.id)}
-                className={`rounded-lg px-4 py-2 text-xs font-semibold transition-all cursor-pointer min-h-[44px] ${
+                className={`rounded-lg px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer min-h-[38px] ${
                   isSelected
                     ? 'bg-blue-600 text-white shadow-xs'
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
               >
-                {grade.name_vi} ({grade.grade_code})
+                {language === 'vi' ? grade.name_vi : grade.name_en}
               </button>
             )
           })}
         </div>
 
         {/* Search input */}
-        <div className="w-full sm:w-72">
+        <div className="w-full sm:w-64">
           <Input
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Tìm mã outcome, kỹ năng..."
+            placeholder={t('grade.searchPlaceholder')}
             leftIcon={
               <svg
                 className="h-4 w-4 text-slate-400"
@@ -133,9 +204,9 @@ export function CurriculumGradeOutcomeTree({
         </div>
       </div>
 
-      {/* Outcome Cards / Table */}
+      {/* Outcome Cards */}
       {outcomes.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 p-12 text-center">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-10 text-center">
           <div className="rounded-full bg-slate-100 p-3 text-slate-400">
             <svg
               className="h-6 w-6"
@@ -152,25 +223,23 @@ export function CurriculumGradeOutcomeTree({
             </svg>
           </div>
           <h3 className="mt-3 text-sm font-semibold text-slate-900">
-            Không tìm thấy chuẩn đầu ra
+            {t('outcome.emptyTitle')}
           </h3>
           <p className="mt-1 text-xs text-slate-500 max-w-sm">
-            {searchQuery
-              ? `Không có kết quả khớp với từ khóa "${searchQuery}". Hãy thử tìm theo từ khóa khác.`
-              : 'Khối lớp này chưa có danh mục chuẩn đầu ra trong phiên bản được chọn.'}
+            {t('outcome.emptyDesc')}
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-3">
           {outcomes.map((outcome) => (
             <div
               key={outcome.id}
-              className="rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-slate-300 shadow-xs flex flex-col gap-3"
+              className="rounded-xl border border-slate-200 bg-slate-50/40 p-4 transition-all hover:border-slate-300 hover:bg-white shadow-2xs flex flex-col gap-3"
             >
               {/* Header */}
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-800 border border-slate-200">
+                  <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-white text-slate-800 border border-slate-200 shadow-2xs">
                     {outcome.outcome_code}
                   </span>
                   <span className="text-xs text-slate-400 font-medium">
@@ -200,7 +269,7 @@ export function CurriculumGradeOutcomeTree({
                         </svg>
                       }
                     >
-                      Ánh xạ kỹ năng
+                      {t('outcome.mapSkillBtn')}
                     </Button>
                   )}
                 </div>
@@ -208,7 +277,7 @@ export function CurriculumGradeOutcomeTree({
 
               {/* Statements (Bilingual) */}
               <div className="flex flex-col gap-1.5 text-xs">
-                <div className="font-medium text-slate-900 leading-relaxed">
+                <div className="font-semibold text-slate-900 leading-relaxed">
                   🇻🇳 {outcome.statement_vi}
                 </div>
                 <div className="text-slate-600 leading-relaxed italic">
@@ -217,37 +286,39 @@ export function CurriculumGradeOutcomeTree({
               </div>
 
               {/* Mapped Skills Section */}
-              <div className="mt-1 rounded-lg bg-slate-50/80 p-3 border border-slate-100 flex flex-col gap-2">
-                <div className="flex items-center justify-between text-xs font-semibold text-slate-600">
+              <div className="mt-1 rounded-lg bg-white p-3 border border-slate-200/80 shadow-2xs flex flex-col gap-2">
+                <div className="flex items-center justify-between text-xs font-semibold text-slate-700">
                   <span>
-                    Kỹ năng EnglishFam được ánh xạ ({outcome.mappings.length}):
+                    {t('outcome.mappedSkills')} ({outcome.mappings.length}):
                   </span>
-                  <span className="text-slate-400 text-[11px] font-normal">
-                    Quan hệ Many-to-Many
+                  <span className="text-slate-400 text-xs font-normal">
+                    {t('outcome.manyToMany')}
                   </span>
                 </div>
 
                 {outcome.mappings.length === 0 ? (
                   <div className="text-xs italic text-slate-400 py-1">
-                    Chưa có kỹ năng nào được ánh xạ tới chuẩn đầu ra này.
+                    {t('outcome.noMappedSkills')}
                   </div>
                 ) : (
                   <div className="flex flex-wrap gap-2">
                     {outcome.mappings.map((mapping) => (
                       <div
                         key={mapping.id}
-                        className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs shadow-2xs"
+                        className="flex items-center gap-2.5 rounded-lg border border-slate-200 bg-slate-50/70 px-2.5 py-1.5 text-xs"
                       >
                         <div className="flex flex-col">
                           <div className="flex items-center gap-1.5">
-                            <span className="font-semibold text-slate-800">
-                              {mapping.skill?.name_vi || mapping.skill_id}
+                            <span className="font-semibold text-slate-900">
+                              {language === 'vi'
+                                ? mapping.skill?.name_vi || mapping.skill_id
+                                : mapping.skill?.name_en || mapping.skill_id}
                             </span>
                             <Badge variant="neutral" size="sm">
                               {mapping.skill?.domain || 'SKILL'}
                             </Badge>
                           </div>
-                          <div className="flex items-center gap-1 text-[10px] text-slate-500 mt-0.5">
+                          <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
                             <Badge
                               variant={roleBadgeVariant(mapping.mapping_role)}
                               size="sm"
@@ -263,8 +334,8 @@ export function CurriculumGradeOutcomeTree({
                               {mapping.importance}
                             </Badge>
                             <span>
-                              Độ tin cậy: {Math.round(mapping.confidence * 100)}
-                              %
+                              {t('outcome.confidence')}{' '}
+                              {Math.round(mapping.confidence * 100)}%
                             </span>
                           </div>
                         </div>

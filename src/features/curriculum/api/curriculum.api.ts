@@ -1,6 +1,6 @@
 import { apiRequest } from '../../../shared/api/api-client'
 import {
-  MOCK_CURRICULUM,
+  MOCK_CURRICULA,
   MOCK_GRADES,
   MOCK_OUTCOMES_BY_GRADE,
   MOCK_SKILLS,
@@ -17,24 +17,35 @@ import type {
   ValidateCurriculumVersionResponse,
 } from '../types/curriculum.types'
 
-// In-memory state for local preview & offline capability
 let localVersions = [...MOCK_VERSIONS]
 const localOutcomesByGrade = { ...MOCK_OUTCOMES_BY_GRADE }
 
 export const curriculumApi = {
-  async getCurriculum(): Promise<Curriculum> {
+  async getCurricula(): Promise<Curriculum[]> {
     try {
-      return await apiRequest<Curriculum>('/admin/curriculum')
+      return await apiRequest<Curriculum[]>('/admin/curricula')
     } catch {
-      return MOCK_CURRICULUM
+      return MOCK_CURRICULA
     }
   },
 
-  async getVersions(): Promise<CurriculumVersion[]> {
+  async getCurriculum(id = 'curr-moet-gdpt'): Promise<Curriculum> {
     try {
-      return await apiRequest<CurriculumVersion[]>('/admin/curriculum/versions')
+      return await apiRequest<Curriculum>(`/admin/curriculum/${id}`)
     } catch {
-      return [...localVersions]
+      return MOCK_CURRICULA.find((c) => c.id === id) || MOCK_CURRICULA[0]
+    }
+  },
+
+  async getVersions(
+    curriculumId = 'curr-moet-gdpt',
+  ): Promise<CurriculumVersion[]> {
+    try {
+      return await apiRequest<CurriculumVersion[]>(
+        `/admin/curriculum/${curriculumId}/versions`,
+      )
+    } catch {
+      return localVersions.filter((v) => v.curriculum_id === curriculumId)
     }
   },
 
@@ -44,10 +55,32 @@ export const curriculumApi = {
         `/admin/curriculum/versions/${versionId}/grades`,
       )
     } catch {
+      // Find matching grades for version, or default to matching curriculum
+      const directMatch = MOCK_GRADES.filter(
+        (g) => g.curriculum_version_id === versionId,
+      )
+      if (directMatch.length > 0) return directMatch
+
+      const currentVer = localVersions.find((v) => v.id === versionId)
+      if (currentVer?.curriculum_id === 'curr-ielts') {
+        return MOCK_GRADES.filter(
+          (g) => g.curriculum_version_id === 'ver-ielts-2025',
+        )
+      }
+      if (currentVer?.curriculum_id === 'curr-toeic') {
+        return MOCK_GRADES.filter(
+          (g) => g.curriculum_version_id === 'ver-toeic-2025',
+        )
+      }
+      if (currentVer?.curriculum_id === 'curr-cambridge') {
+        return MOCK_GRADES.filter(
+          (g) => g.curriculum_version_id === 'ver-cambridge-2024',
+        )
+      }
+
+      // Default MOET 1-12
       return MOCK_GRADES.filter(
-        (g) =>
-          g.curriculum_version_id === versionId ||
-          g.curriculum_version_id === 'ver-2022-v2',
+        (g) => g.curriculum_version_id === 'ver-2022-v2',
       )
     }
   },
@@ -115,7 +148,7 @@ export const curriculumApi = {
           {
             field: 'mappings',
             message:
-              'Khối lớp 8 và 9 hiện tại đang chờ bổ sung chi tiết chuẩn đầu ra song ngữ.',
+              'Khung chương trình đã kết nối đầy đủ các bậc học từ Tiểu học đến THPT.',
           },
         ],
       }
