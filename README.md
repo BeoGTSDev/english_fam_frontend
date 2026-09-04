@@ -24,6 +24,38 @@ For Phase 8+ runtime work, the frontend architecture rules are mandatory. The de
 - Vite
 - Tailwind CSS
 
+## Runtime architecture
+
+The EFA-236 application foundation follows the EFA-233 feature-first baseline:
+
+```text
+src/
+├── app/
+│   ├── bootstrap/
+│   ├── layouts/
+│   └── routes/
+├── features/
+├── shared/
+│   ├── api/
+│   └── errors/
+├── config/
+├── App.tsx
+└── main.tsx
+```
+
+Feature Jira tickets own their feature folders (`auth`, `learner`, `guardian`, `admin`, `curriculum`, `content`, `assessment`, `roadmap`, `learning`, `ai-tutor`) when those modules are implemented. Shared code is reserved for genuine cross-cutting primitives.
+
+### Parallel frontend development
+
+For two-developer Phase 8 work:
+
+1. branch from current `main` using a Jira-keyed English branch name;
+2. keep each PR scoped primarily to its Jira feature folder;
+3. avoid unrelated edits to `src/app`, `src/shared` and global styling;
+4. if shared-foundation changes are required, keep them small and explicit in the Jira/PR scope;
+5. rebase/update from `main` before final review when another FE PR has merged first;
+6. required CI checks must pass before Squash & Merge.
+
 ## Local development
 
 ```bash
@@ -43,16 +75,20 @@ The Vite dev server starts on its normal local port (typically `http://localhost
 Available checks:
 
 ```bash
-npm run typecheck
+npm run format:check
 npm run lint
+npm run typecheck
+npm run test:coverage
 npm run build
+npm run dependency:check
+npm run security:audit
 ```
 
 ## Environment variables
 
 Only variables prefixed with `VITE_` are browser-exposed. Keep them client-safe. Never add service-role keys, signing secrets or private provider credentials to frontend environment variables.
 
-See `.env.example` for the approved variable names.
+See `.env.example` for the approved variable names. Shared API transport reads `VITE_API_BASE_URL`; feature API modules must use the approved backend contract rather than direct protected-database access.
 
 ## Repository workflow
 
@@ -68,4 +104,4 @@ Do not commit real credentials. Local configuration belongs in ignored `.env*` f
 
 ## Current status
 
-Phase 7 frontend local environment scaffold is established by EFA-176. The current screen is an environment smoke surface only; product UI behavior remains subject to approved Phase 5 design artifacts, the EFA-233 frontend coding-architecture baseline and later implementation Jira issues.
+Phase 7 frontend local environment setup is complete. EFA-236 establishes the Phase 8 application foundation so multiple frontend developers can work in separate feature areas against the frozen Phase 5 UI baseline, Phase 6 API/security contracts and EFA-233 architecture rules.
