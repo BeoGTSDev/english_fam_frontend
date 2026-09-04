@@ -3,11 +3,11 @@ import { describe, expect, it } from 'vitest'
 
 import App from './App'
 
-describe('App scaffold', () => {
-  it('renders the approved development-environment readiness surface', () => {
+describe('App foundation', () => {
+  it('renders the Phase 8 frontend application foundation surface', () => {
     const html = renderToStaticMarkup(<App />)
 
     expect(html).toContain('EnglishFam')
-    expect(html).toContain('Frontend development environment ready')
+    expect(html).toContain('Frontend application foundation ready')
   })
 })
