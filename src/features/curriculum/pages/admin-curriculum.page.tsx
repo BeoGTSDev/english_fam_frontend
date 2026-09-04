@@ -164,8 +164,14 @@ export function AdminCurriculumPage() {
                   : c.id === 'curr-ielts'
                     ? { label: 'IELTS', bg: 'bg-amber-100 text-amber-700' }
                     : c.id === 'curr-toeic'
-                      ? { label: 'TOEIC', bg: 'bg-emerald-100 text-emerald-700' }
-                      : { label: 'CAMBRIDGE', bg: 'bg-purple-100 text-purple-700' }
+                      ? {
+                          label: 'TOEIC',
+                          bg: 'bg-emerald-100 text-emerald-700',
+                        }
+                      : {
+                          label: 'CAMBRIDGE',
+                          bg: 'bg-purple-100 text-purple-700',
+                        }
 
               return (
                 <button
