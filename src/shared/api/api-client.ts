@@ -2,7 +2,9 @@ import { readClientEnv } from '../../config/env'
 import { AppError, type AppErrorKind } from '../errors/app-error'
 
 interface ApiErrorEnvelope {
-  code?: string
+  error?: {
+    code?: string
+  }
 }
 
 function classifyStatus(status: number): AppErrorKind {
@@ -45,10 +47,18 @@ async function readErrorEnvelope(
   try {
     const body = (await response.json()) as unknown
 
-    if (typeof body === 'object' && body !== null && 'code' in body) {
-      const code = Reflect.get(body, 'code')
-      return typeof code === 'string' ? { code } : {}
+    if (typeof body !== 'object' || body === null || !('error' in body)) {
+      return {}
     }
+
+    const error = Reflect.get(body, 'error')
+
+    if (typeof error !== 'object' || error === null || !('code' in error)) {
+      return {}
+    }
+
+    const code = Reflect.get(error, 'code')
+    return typeof code === 'string' ? { error: { code } } : {}
   } catch {
     // Never surface raw transport/backend payloads to the UI error model.
   }
@@ -66,24 +76,26 @@ export async function apiRequest<T>(
     throw new AppError('configuration', safeMessage('configuration'))
   }
 
+  const headers = new Headers(init.headers)
+
+  if (!headers.has('Accept')) {
+    headers.set('Accept', 'application/json')
+  }
+
   const response = await fetch(
     `${apiBaseUrl.replace(/\/$/, '')}/${path.replace(/^\//, '')}`,
     {
       ...init,
-      credentials: 'include',
-      headers: {
-        Accept: 'application/json',
-        ...init.headers,
-      },
+      headers,
     },
   )
 
   if (!response.ok) {
     const kind = classifyStatus(response.status)
-    const { code } = await readErrorEnvelope(response)
+    const envelope = await readErrorEnvelope(response)
     throw new AppError(kind, safeMessage(kind), {
       status: response.status,
-      code,
+      code: envelope.error?.code,
     })
   }
 
