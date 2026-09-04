@@ -8,10 +8,13 @@ Product scope, requirements, learning rules, API/security contracts and technica
 
 - [BeoGTSDev/english_fam_docs](https://github.com/BeoGTSDev/english_fam_docs)
 - Code workflow: `english_fam_docs/docs/06-development/CODE_REPOSITORY_WORKFLOW_EN.md`
+- **Frontend coding architecture & folder rules:** `english_fam_docs/docs/06-development/FRONTEND_ARCHITECTURE_RULES_EN.md`
 - Agent workflow: `english_fam_docs/AGENTS.md`
 - Development environment: `english_fam_docs/docs/06-development/DEVELOPMENT_ENVIRONMENT_EN.md`
 
 This repository consumes those approved contracts rather than redefining them locally.
+
+For Phase 8+ runtime work, the frontend architecture rules are mandatory. The default feature direction is `Page/Route -> Feature Component -> Feature Hook/UI Controller -> API Client/Service -> Backend API`. Client routing/role visibility is UX only and must never become authorization or canonical learning/assessment truth.
 
 ## Toolchain
 
@@ -65,4 +68,4 @@ Do not commit real credentials. Local configuration belongs in ignored `.env*` f
 
 ## Current status
 
-Phase 7 frontend local environment scaffold is established by EFA-176. The current screen is an environment smoke surface only; product UI behavior remains subject to approved Phase 5 design artifacts and later implementation Jira issues.
+Phase 7 frontend local environment scaffold is established by EFA-176. The current screen is an environment smoke surface only; product UI behavior remains subject to approved Phase 5 design artifacts, the EFA-233 frontend coding-architecture baseline and later implementation Jira issues.
