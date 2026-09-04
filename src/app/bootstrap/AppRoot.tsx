@@ -8,10 +8,12 @@ export function AppRoot() {
           <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
             EnglishFam
           </p>
-          <h1 className="mt-3 text-3xl font-bold">Frontend application foundation ready</h1>
+          <h1 className="mt-3 text-3xl font-bold">
+            Frontend application foundation ready
+          </h1>
           <p className="mt-4 text-slate-600">
-            Phase 8 feature work must follow the approved feature-first architecture, API contracts,
-            role boundaries and frozen UI baseline.
+            Phase 8 feature work must follow the approved feature-first
+            architecture, API contracts, role boundaries and frozen UI baseline.
           </p>
         </section>
       </main>
