@@ -3,11 +3,13 @@ import { describe, expect, it } from 'vitest'
 
 import App from './App'
 
-describe('App foundation', () => {
-  it('renders the Phase 8 frontend application foundation surface', () => {
+describe('App', () => {
+  it('renders the private EnglishFam sign-in surface', () => {
     const html = renderToStaticMarkup(<App />)
 
     expect(html).toContain('EnglishFam')
-    expect(html).toContain('Frontend application foundation ready')
+    expect(html).toContain('Welcome back')
+    expect(html).toContain('name="username"')
+    expect(html).not.toContain('Sign Up')
   })
 })
