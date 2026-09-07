@@ -1,22 +1,18 @@
 import { AppShell } from '../layouts/AppShell'
+import type { SignInHandler } from '../../features/auth/auth.types'
+import { LoginPage } from '../../features/auth/pages/LoginPage'
+
+// The approved username/session contract is not available in this repository yet.
+// Keep the UI on the typed boundary instead of inventing a backend endpoint.
+const unavailableSignIn: SignInHandler = async () => ({
+  ok: false,
+  reason: 'unavailable',
+})
 
 export function AppRoot() {
   return (
     <AppShell>
-      <main className="px-6 py-12">
-        <section className="mx-auto max-w-3xl rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-          <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-            EnglishFam
-          </p>
-          <h1 className="mt-3 text-3xl font-bold">
-            Frontend application foundation ready
-          </h1>
-          <p className="mt-4 text-slate-600">
-            Phase 8 feature work must follow the approved feature-first
-            architecture, API contracts, role boundaries and frozen UI baseline.
-          </p>
-        </section>
-      </main>
+      <LoginPage onSignIn={unavailableSignIn} />
     </AppShell>
   )
 }
