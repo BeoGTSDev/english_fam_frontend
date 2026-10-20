@@ -59,15 +59,15 @@ For two-developer Phase 8 work:
 ## Local development
 
 ```bash
-npm install
-cp .env.example .env.local
+npm ci
+test -e .env.local || cp .env.example .env.local
 npm run dev
 ```
 
 On Windows PowerShell, copy the environment template with:
 
 ```powershell
-Copy-Item .env.example .env.local
+if (-not (Test-Path -LiteralPath .env.local)) { Copy-Item .env.example .env.local }
 ```
 
 The Vite dev server starts on its normal local port (typically `http://localhost:5173`).
@@ -89,6 +89,39 @@ npm run security:audit
 Only variables prefixed with `VITE_` are browser-exposed. Keep them client-safe. Never add service-role keys, signing secrets or private provider credentials to frontend environment variables.
 
 See `.env.example` for the approved variable names. Shared API transport reads `VITE_API_BASE_URL`; feature API modules must use the approved backend contract rather than direct protected-database access.
+
+### Standalone backend Auth integration — 2026-10-20
+
+Point `VITE_API_BASE_URL` at the Node API, for example `http://127.0.0.1:3000/api/v1`.
+The backend `APP_ORIGIN` must exactly match the Vite browser origin (including localhost versus
+127.0.0.1). Existing local environment files are not overwritten by the template update.
+The login identifier is the Admin-provisioned account email; passwords are sent unchanged.
+The Auth API module validates the success envelope and verifies `GET /session` before showing
+authenticated identity. The current authenticated surface confirms identity and supports logout;
+it does not implement the planned Student/Guardian/Admin dashboards.
+
+Opaque Bearer tokens exist only in memory. Reloading or closing the tab requires sign-in again;
+there is no browser-storage persistence, refresh token, cookie authentication or public signup.
+Server expiry clears client identity; returning to a visible tab rechecks current account status.
+Logout immediately clears local identity and attempts server revocation; a dependency failure is
+reported safely because revocation cannot then be guaranteed. Backend authorization remains
+authoritative on every protected request. The shared HTTP transport has a 20-second timeout,
+caller cancellation and safe error mapping; it never navigates or displays notifications itself.
+
+Auth integration is under `features/auth/api/` and `features/auth/hooks/useAuthSession.ts`;
+application bootstrap owns composition. Unit/DOM tests cover credential denial, safe projection,
+expiry, revocation failure, stale responses and the login/session/logout HTTP envelopes.
+Coverage now includes Auth API, session lifecycle and shared HTTP transport in addition to App;
+it does not represent all planned frontend features. Real browser acceptance uses synthetic
+accounts against the local Node API and PostgreSQL, never real family credentials.
+
+Local acceptance on 2026-10-20: 57 tests passed; configured coverage reached 85.15% branches
+and 93.33% lines. Typecheck, lint, format, build and dependency checks passed; npm audit
+reported zero vulnerabilities after updating the transitive source-map-js patch. Browser
+checks passed for login, verified identity, logout, credential denial and reload. Synthetic
+fixtures and temporary browser API/Vite servers were removed/stopped afterward. CI installs
+from the lockfile with `npm ci`; LF checkout rules make formatting reproducible on Windows.
+These are local results; no staging, deployment, PR merge or feature-complete dashboard is claimed.
 
 ## Repository workflow
 

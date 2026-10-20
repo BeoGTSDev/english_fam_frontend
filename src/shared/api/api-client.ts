@@ -82,26 +82,58 @@ export async function apiRequest<T>(
     headers.set('Accept', 'application/json')
   }
 
-  const response = await fetch(
-    `${apiBaseUrl.replace(/\/$/, '')}/${path.replace(/^\//, '')}`,
-    {
-      ...init,
-      headers,
-    },
-  )
+  const controller = new AbortController()
+  const cancel = () => controller.abort()
+  const callerSignal = init.signal
+  let timedOut = false
+  const timeout = setTimeout(() => {
+    timedOut = true
+    controller.abort()
+  }, 20_000)
+  if (callerSignal?.aborted) cancel()
+  else callerSignal?.addEventListener('abort', cancel, { once: true })
 
-  if (!response.ok) {
-    const kind = classifyStatus(response.status)
-    const envelope = await readErrorEnvelope(response)
-    throw new AppError(kind, safeMessage(kind), {
-      status: response.status,
-      code: envelope.error?.code,
+  const transportError = () =>
+    new AppError('retryable-dependency', safeMessage('retryable-dependency'), {
+      code: timedOut
+        ? 'REQUEST_TIMEOUT'
+        : callerSignal?.aborted
+          ? 'REQUEST_CANCELLED'
+          : 'NETWORK_UNAVAILABLE',
     })
-  }
 
-  if (response.status === 204) {
-    return undefined as T
-  }
+  try {
+    if (controller.signal.aborted) throw transportError()
+    let response: Response
+    try {
+      response = await fetch(
+        `${apiBaseUrl.replace(/\/$/, '')}/${path.replace(/^\//, '')}`,
+        { ...init, headers, signal: controller.signal },
+      )
+    } catch {
+      throw transportError()
+    }
 
-  return (await response.json()) as T
+    if (!response.ok) {
+      const kind = classifyStatus(response.status)
+      const envelope = await readErrorEnvelope(response)
+      if (controller.signal.aborted) throw transportError()
+      throw new AppError(kind, safeMessage(kind), {
+        status: response.status,
+        code: envelope.error?.code,
+      })
+    }
+
+    if (response.status === 204) return undefined as T
+
+    try {
+      return (await response.json()) as T
+    } catch {
+      if (controller.signal.aborted) throw transportError()
+      throw new AppError('unknown', safeMessage('unknown'))
+    }
+  } finally {
+    clearTimeout(timeout)
+    callerSignal?.removeEventListener('abort', cancel)
+  }
 }
