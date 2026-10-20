@@ -7,7 +7,12 @@ export default defineConfig({
     environment: 'node',
     coverage: {
       provider: 'v8',
-      include: ['src/App.tsx'],
+      include: [
+        'src/App.tsx',
+        'src/features/auth/api/auth-api.ts',
+        'src/features/auth/hooks/useAuthSession.ts',
+        'src/shared/api/api-client.ts',
+      ],
       reporter: ['text', 'json-summary'],
       thresholds: {
         lines: 80,
