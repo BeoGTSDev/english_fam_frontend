@@ -129,7 +129,7 @@ These are local results; no staging, deployment, PR merge or feature-complete da
 timeout/result/retest, and capability-checked Admin queue/evidence/review history. The Auth
 hook supplies an authorized request closure through the existing safe transport; feature state
 never persists tokens. Uncertain answers retain their payload/idempotency key for retry.
-Re-login discovers the own current attempt; browser events are advisory, not scoring authority.
+Failed initial discovery has an explicit retry without new admission. Re-login discovers the own current attempt; browser events are advisory, not scoring authority.
 EN/VI screens include loading/error/empty/review/expired states and native keyboard radios.
 
 Use the coordinated backend/docs EFA-208 branches: the backend needs local migrations and
@@ -137,7 +137,7 @@ explicitly approved compatible blueprint/policies/content. Missing configuration
 as unavailable rather than simulated success. No real approved bank/calibration is seeded.
 Productive-domain scoring, Progress, personalized roadmap and full dashboards remain separate work.
 
-Local verification: 64 unit/DOM tests passed, including six Assessment flow scenarios;
+Local verification: 66 unit/DOM tests passed, including eight Assessment flow scenarios;
 configured Auth/transport coverage reached 84.5% branches and 91.66% lines. This is not
 whole-feature/system coverage. Real browser QA passed eight synthetic answers, final result,
 Admin verification and updated Student result after re-login. Typecheck/lint/format/build

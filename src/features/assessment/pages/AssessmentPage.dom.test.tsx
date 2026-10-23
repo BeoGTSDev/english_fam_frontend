@@ -51,6 +51,57 @@ afterEach(() => {
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
 })
+it.each(['VERIFIED', 'ACTIVE'])(
+  'recovers failed current-attempt discovery for %s without a new admission',
+  async (status) => {
+    let reads = 0
+    const request = vi.fn().mockImplementation(async (path: string) => {
+      if (path === 'assessment/current') {
+        if (++reads === 1)
+          throw new AppError(
+            'retryable-dependency',
+            'private discovery failure',
+          )
+        return envelope({ session_id: id, status })
+      }
+      if (path.startsWith('assessment/next-question'))
+        return envelope(
+          status === 'ACTIVE'
+            ? question()
+            : { session_id: id, status, complete: true },
+        )
+      if (path === 'assessment/event')
+        return envelope({ session_id: id, recorded: true })
+      if (path.startsWith('assessment/result/')) return envelope(result())
+      throw new Error('Unexpected test request')
+    })
+    const user = userEvent.setup()
+    render(<AssessmentPage request={request} role="STUDENT" locale="en" />)
+    const recovery = await screen.findByRole('button', {
+      name: 'Recover current state',
+    })
+    expect(
+      (
+        screen.getByRole('button', {
+          name: 'Start placement',
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(true)
+    await user.click(recovery)
+    if (status === 'ACTIVE') {
+      await screen.findByText('Choose the suitable word.')
+      await waitFor(() =>
+        expect(
+          request.mock.calls.filter((call) => call[0] === 'assessment/event'),
+        ).toHaveLength(1),
+      )
+    } else await screen.findByText('Verified', { exact: true })
+    expect(reads).toBe(2)
+    expect(
+      request.mock.calls.some((call) => call[0] === 'assessment/start'),
+    ).toBe(false)
+  },
+)
 it('runs the student flow with server acknowledgments and safe projected content', async () => {
   const request = vi.fn().mockImplementation(async (path: string) => {
     if (path === 'assessment/current') return envelope({ session_id: null })

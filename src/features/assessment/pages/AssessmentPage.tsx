@@ -392,9 +392,18 @@ function StudentAssessment({
         <div className="mt-5 space-y-5">
           <p>{c.intro}</p>
           <p className="text-sm text-slate-600">{c.retention}</p>
+          {state.error && (
+            <button
+              className={secondary}
+              disabled={state.busy}
+              onClick={() => void state.resume()}
+            >
+              {c.retry}
+            </button>
+          )}
           <button
             className={button}
-            disabled={state.busy}
+            disabled={state.busy || !state.discovered}
             onClick={() =>
               void (state.current.session_id &&
               state.current.status !== 'RETEST_REQUIRED'

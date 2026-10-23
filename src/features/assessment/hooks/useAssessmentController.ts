@@ -23,6 +23,7 @@ export function useAssessmentController(request: AuthorizedApiRequest) {
     [error, setError] = useState('')
   const [pending, setPending] = useState<PendingAnswer | null>(null)
   const [active, setActive] = useState(false)
+  const [discovered, setDiscovered] = useState(false)
   const [clock, setClock] = useState<{
     duration: number
     anchor: number
@@ -119,6 +120,7 @@ export function useAssessmentController(request: AuthorizedApiRequest) {
       const session = await api.current()
       commit(() => {
         setCurrent(session)
+        setDiscovered(true)
         refreshEvidence.current =
           session.status === 'ACTIVE' || session.status === 'CREATED'
       })
@@ -158,16 +160,27 @@ export function useAssessmentController(request: AuthorizedApiRequest) {
   const resume = useCallback(
     () =>
       run(async (api, commit) => {
-        if (!current.session_id) return
-        const resumed = await load(api, current.session_id, commit)
+        // A failed discovery read must remain recoverable without a new admission.
+        const session = current.session_id ? current : await api.current()
+        commit(() => {
+          setCurrent(session)
+          setDiscovered(true)
+          if (
+            !current.session_id &&
+            (session.status === 'ACTIVE' || session.status === 'CREATED')
+          )
+            refreshEvidence.current = true
+        })
+        if (!session.session_id) return
+        const resumed = await load(api, session.session_id, commit)
         if (resumed && refreshEvidence.current) {
           refreshEvidence.current = false
           await api
-            .event(current.session_id, 'SESSION_REFRESH', crypto.randomUUID())
+            .event(session.session_id, 'SESSION_REFRESH', crypto.randomUUID())
             .catch(() => {})
         }
       }),
-    [current.session_id, load, run],
+    [current, load, run],
   )
   const submit = useCallback(
     (option: string) =>
@@ -287,6 +300,7 @@ export function useAssessmentController(request: AuthorizedApiRequest) {
   }, [active, recordEvent])
   return {
     current,
+    discovered,
     item,
     result,
     busy,
