@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AppError } from '../../../shared/errors/app-error'
 import {
+  apiRequest,
+  type AuthorizedApiRequest,
+} from '../../../shared/api/api-client'
+import {
   authApi,
   type BackendSession,
   type SessionProfile,
@@ -70,6 +74,39 @@ export function useAuthSession(api = authApi) {
         )
     }
   }
+  const request: AuthorizedApiRequest = useCallback(
+    async <T>(path: string, init: RequestInit = {}): Promise<T> => {
+      if (init.signal?.aborted)
+        throw new AppError(
+          'retryable-dependency',
+          'The request was cancelled.',
+          { code: 'REQUEST_CANCELLED' },
+        )
+      const active = session.current,
+        revision = generation.current
+      if (!active || active.expiresAt <= Date.now()) {
+        clear('Your session has expired. Please sign in again.')
+        throw new AppError('unauthenticated', 'Authentication is required.')
+      }
+      const headers = new Headers(init.headers)
+      headers.set('Authorization', `Bearer ${active.accessToken}`)
+      try {
+        const value = await apiRequest<T>(path, { ...init, headers })
+        if (generation.current !== revision)
+          throw new AppError('unauthenticated', 'Authentication is required.')
+        return value
+      } catch (error) {
+        if (
+          generation.current === revision &&
+          error instanceof AppError &&
+          error.kind === 'unauthenticated'
+        )
+          clear('Your session is no longer available. Please sign in again.')
+        throw error
+      }
+    },
+    [clear],
+  )
 
   useEffect(() => {
     const active = session.current
@@ -126,5 +163,5 @@ export function useAuthSession(api = authApi) {
     },
     [],
   )
-  return { profile, notice, signIn, signOut }
+  return { profile, notice, signIn, signOut, request }
 }
