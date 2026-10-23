@@ -1,5 +1,9 @@
 import { readClientEnv } from '../../config/env'
 import { AppError, type AppErrorKind } from '../errors/app-error'
+export type AuthorizedApiRequest = <T>(
+  path: string,
+  init?: RequestInit,
+) => Promise<T>
 
 interface ApiErrorEnvelope {
   error?: {

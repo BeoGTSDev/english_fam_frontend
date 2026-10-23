@@ -2,9 +2,10 @@ import { AppShell } from '../layouts/AppShell'
 import { LoginPage } from '../../features/auth/pages/LoginPage'
 import { useAuthSession } from '../../features/auth/hooks/useAuthSession'
 import { englishLoginCopy } from '../../features/auth/login.copy'
+import { AssessmentPage } from '../../features/assessment/pages/AssessmentPage'
 
 export function AppRoot() {
-  const { profile, notice, signIn, signOut } = useAuthSession()
+  const { profile, notice, signIn, signOut, request } = useAuthSession()
   return (
     <AppShell>
       {notice && (
@@ -13,7 +14,7 @@ export function AppRoot() {
         </p>
       )}
       {profile ? (
-        <main className="mx-auto max-w-xl p-8">
+        <main className="mx-auto max-w-4xl p-4 sm:p-8">
           <h1 className="text-2xl font-semibold">EnglishFam</h1>
           <p className="my-4">Signed in as {profile.display_name}.</p>
           <button
@@ -23,6 +24,14 @@ export function AppRoot() {
           >
             Sign out
           </button>
+          {(profile.role === 'STUDENT' || profile.role === 'ADMIN') && (
+            <AssessmentPage
+              key={profile.profile_id}
+              request={request}
+              role={profile.role}
+              locale={profile.locale}
+            />
+          )}
         </main>
       ) : (
         <LoginPage

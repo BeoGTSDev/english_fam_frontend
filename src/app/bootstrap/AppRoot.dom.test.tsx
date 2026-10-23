@@ -34,6 +34,7 @@ describe('browser Auth through feature API and HTTP envelopes', () => {
           },
         }),
       )
+      .mockResolvedValueOnce(Response.json({ data: { session_id: null } }))
       .mockResolvedValueOnce(Response.json({ data: { signed_out: true } }))
     vi.stubGlobal('fetch', fetcher)
     const user = userEvent.setup()
@@ -56,12 +57,13 @@ describe('browser Auth through feature API and HTTP envelopes', () => {
     ).toBe('Bearer opaque-session')
     await user.click(screen.getByRole('button', { name: 'Sign out' }))
     expect(await screen.findByLabelText('Email')).toBeDefined()
-    expect(fetcher.mock.calls[2][0]).toBe(
-      'http://localhost:3000/api/v1/auth/logout',
+    const logout = fetcher.mock.calls.find(
+      (call) => call[0] === 'http://localhost:3000/api/v1/auth/logout',
     )
-    expect(
-      new Headers(fetcher.mock.calls[2][1].headers).get('Authorization'),
-    ).toBe('Bearer opaque-session')
+    expect(logout?.[0]).toBe('http://localhost:3000/api/v1/auth/logout')
+    expect(new Headers(logout![1].headers).get('Authorization')).toBe(
+      'Bearer opaque-session',
+    )
   })
   it('shows safe credential denial without raw backend details', async () => {
     vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:3000/api/v1')

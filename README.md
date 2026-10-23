@@ -123,6 +123,26 @@ fixtures and temporary browser API/Vite servers were removed/stopped afterward. 
 from the lockfile with `npm ci`; LF checkout rules make formatting reproducible on Windows.
 These are local results; no staging, deployment, PR merge or feature-complete dashboard is claimed.
 
+### Objective Placement integration — EFA-208, 2026-10-23
+
+`features/assessment` owns Student start/resume, text objective questions, server-authoritative
+timeout/result/retest, and capability-checked Admin queue/evidence/review history. The Auth
+hook supplies an authorized request closure through the existing safe transport; feature state
+never persists tokens. Uncertain answers retain their payload/idempotency key for retry.
+Failed initial discovery has an explicit retry without new admission. Re-login discovers the own current attempt; browser events are advisory, not scoring authority.
+EN/VI screens include loading/error/empty/review/expired states and native keyboard radios.
+
+Use the coordinated backend/docs EFA-208 branches: the backend needs local migrations and
+explicitly approved compatible blueprint/policies/content. Missing configuration is displayed
+as unavailable rather than simulated success. No real approved bank/calibration is seeded.
+Productive-domain scoring, Progress, personalized roadmap and full dashboards remain separate work.
+
+Local verification: 66 unit/DOM tests passed, including eight Assessment flow scenarios;
+configured Auth/transport coverage reached 84.5% branches and 91.66% lines. This is not
+whole-feature/system coverage. Real browser QA passed eight synthetic answers, final result,
+Admin verification and updated Student result after re-login. Typecheck/lint/format/build
+passed. Vite 8.3.5 and Vitest/coverage 4.1.12 are pinned. Staging remains deferred.
+
 ## Repository workflow
 
 `main` is the latest approved repository state. Runtime work uses short-lived Jira-keyed branches and Pull Requests, normally ending in Squash & Merge.

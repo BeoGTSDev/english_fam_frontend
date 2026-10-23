@@ -23,8 +23,45 @@ afterEach(() => {
   cleanup()
   vi.useRealTimers()
   vi.restoreAllMocks()
+  vi.unstubAllGlobals()
+  vi.unstubAllEnvs()
 })
 describe('in-memory backend session lifecycle', () => {
+  it('authorizes feature requests in memory, preserves permission denial and clears expired identity', async () => {
+    vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:3000/api/v1')
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(Response.json({ data: { session_id: null } }))
+      .mockResolvedValueOnce(
+        Response.json({ error: { code: 'FORBIDDEN' } }, { status: 403 }),
+      )
+      .mockResolvedValueOnce(
+        Response.json({ error: { code: 'AUTH_REQUIRED' } }, { status: 401 }),
+      )
+    vi.stubGlobal('fetch', fetcher)
+    const { result } = renderHook(() => useAuthSession(api()))
+    await act(async () => {
+      await result.current.signIn({ username: 'u', password: 'p' })
+    })
+    await expect(result.current.request('assessment/current')).resolves.toEqual(
+      { data: { session_id: null } },
+    )
+    expect(
+      new Headers(fetcher.mock.calls[0][1].headers).get('Authorization'),
+    ).toBe('Bearer private-token')
+    await act(async () => {
+      await expect(
+        result.current.request('admin/assessment-reviews'),
+      ).rejects.toMatchObject({ kind: 'forbidden' })
+    })
+    expect(result.current.profile).toEqual(profile)
+    await act(async () => {
+      await expect(
+        result.current.request('assessment/current'),
+      ).rejects.toMatchObject({ kind: 'unauthenticated' })
+    })
+    expect(result.current.profile).toBeNull()
+  })
   it('does not let an old failed logout overwrite a newly verified session', async () => {
     const backend = api()
     let reject!: (error: Error) => void
